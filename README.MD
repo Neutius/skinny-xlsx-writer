@@ -37,14 +37,4 @@ This module is designed with two main goals:
 5. Write the .xlsx file to disk.
 
 
-## Implementation Design (note to self, don't push this part to git)
-
-- Use File API or use Path API?
-
-- Sheet:
-	- standard no column header (boolean: false). If added: boolean true + String[]
-	- same for title/description
-	- fields: boolean withTitle, String title, boolean withHeaders, String[] 
-
-
 
