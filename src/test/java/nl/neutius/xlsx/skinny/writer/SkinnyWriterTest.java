@@ -3,6 +3,7 @@ package nl.neutius.xlsx.skinny.writer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -17,6 +18,38 @@ import java.util.List;
 class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
 
     @Test
+    void addContent_fileHasContent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
+        writer.createNewXlsxFile();
+        writer.addRowToCurrentSheet(List.of("entry"));
+        writer.writeToFile();
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+
+        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet).isNotEmpty();
+        assertThat(actualSheet).hasSize(1);
+        assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
+        assertThat(actualSheet.getLastRowNum()).isEqualTo(0);
+
+        Row actualRow = actualSheet.getRow(0);
+        assertThat(actualRow).isNotNull();
+        assertThat(actualRow).isNotEmpty();
+        assertThat(actualRow).hasSize(1);
+        assertThat((int) actualRow.getFirstCellNum()).isEqualTo(0);
+        assertThat((int) actualRow.getLastCellNum()).isEqualTo(1);
+        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
+        assertThat(actualRow.getRowNum()).isEqualTo(0);
+
+        Cell actualCell = actualRow.getCell(0);
+        assertThat(actualCell).isNotNull();
+        assertThat(actualCell.getSheet()).isEqualTo(actualSheet);
+        assertThat(actualCell.getStringCellValue()).isEqualTo("entry");
+        assertThat(actualCell.getColumnIndex()).isEqualTo(0);
+        assertThat(actualCell.getRowIndex()).isEqualTo(0);
+    }
+
+    @Test
     void addSeveralRows_allRowsArePresent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
@@ -25,7 +58,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(List.of("entry1"));
         writer.addRowToCurrentSheet(List.of("entry2"));
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).hasSize(3);
@@ -44,7 +77,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(List.of("entry0"), List.of("entry1"), List.of("entry2")));
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).hasSize(3);
@@ -67,7 +100,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
 
         assertThat(actualSheet.getRow(0)).isNotNull().isNotEmpty().hasSize(5);
@@ -101,7 +134,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(List.of(valueWithTabs, valueWithNewLines, valueWithSpecialCharacters));
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(1);
@@ -129,7 +162,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(entryList);
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(1);
@@ -158,7 +191,7 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
         writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(3);

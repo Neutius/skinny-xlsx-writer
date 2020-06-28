@@ -8,6 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         }
     }
 
+    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
     void verifySetUp_targetFolderIsUsable() {
         assertThat(targetFolder).exists();
@@ -40,6 +42,7 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(targetFolder).canWrite();
     }
 
+    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
     void createNewFile_fileExists() throws IOException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
@@ -50,6 +53,7 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(expectedFile).exists();
     }
 
+    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
     void createNewFile_emptyFileIsValidXlsxFile() throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
@@ -57,7 +61,7 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         writer.createNewXlsxFile();
 
         File targetFile = new File(targetFolder, FILE_NAME + EXTENSION);
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(targetFile);
+        actualWorkbook = new XSSFWorkbook(targetFile);
         XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
 
         assertThat(actualSheet).isNotNull();
@@ -69,38 +73,6 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualSheet.getCellComments()).isEmpty();
         assertThat(actualSheet.getSheetName()).isEqualTo(SHEET_NAME);
         assertThat(actualSheet).isEqualTo(actualWorkbook.getSheet(SHEET_NAME));
-    }
-
-    @Test
-    void addContent_fileHasContent() throws IOException, InvalidFormatException {
-        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-
-        writer.createNewXlsxFile();
-        writer.addRowToCurrentSheet(List.of("entry"));
-        writer.writeToFile();
-        XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
-        assertThat(actualSheet).isNotEmpty();
-        assertThat(actualSheet).hasSize(1);
-        assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
-        assertThat(actualSheet.getLastRowNum()).isEqualTo(0);
-
-        Row actualRow = actualSheet.getRow(0);
-        assertThat(actualRow).isNotNull();
-        assertThat(actualRow).isNotEmpty();
-        assertThat(actualRow).hasSize(1);
-        assertThat((int) actualRow.getFirstCellNum()).isEqualTo(0);
-        assertThat((int) actualRow.getLastCellNum()).isEqualTo(1);
-        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
-        assertThat(actualRow.getRowNum()).isEqualTo(0);
-
-        Cell actualCell = actualRow.getCell(0);
-        assertThat(actualCell).isNotNull();
-        assertThat(actualCell.getSheet()).isEqualTo(actualSheet);
-        assertThat(actualCell.getStringCellValue()).isEqualTo("entry");
-        assertThat(actualCell.getColumnIndex()).isEqualTo(0);
-        assertThat(actualCell.getRowIndex()).isEqualTo(0);
     }
 
 }
