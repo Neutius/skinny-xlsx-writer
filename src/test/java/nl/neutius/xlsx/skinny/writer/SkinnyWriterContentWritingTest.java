@@ -21,7 +21,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
     void addContent_fileHasContent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(List.of("entry"));
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
@@ -53,7 +52,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
     void addSeveralRows_allRowsArePresent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(List.of("entry0"));
         writer.addRowToCurrentSheet(List.of("entry1"));
         writer.addRowToCurrentSheet(List.of("entry2"));
@@ -74,7 +72,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
     void addSeveralRowsAsOneList_allRowsArePresent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(List.of("entry0"), List.of("entry1"), List.of("entry2")));
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
@@ -97,7 +94,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
         List<String> secondRow = List.of("entry1", "false", "true", "null");
         List<String> thirdRow = List.of("entry2", "", "", "", "", "sixth      column");
 
-        writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
@@ -132,7 +128,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
         String valueWithNewLines = "we \n use \n new \n lines \n\n\n\n within a \n single \n value";
         String valueWithSpecialCharacters = " \\ \\ \" \" ; || ;; | , . \" ";
 
-        writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(List.of(valueWithTabs, valueWithNewLines, valueWithSpecialCharacters));
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
@@ -160,7 +155,6 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
         entryList.add(null);
         entryList.add("value2");
 
-        writer.createNewXlsxFile();
         writer.addRowToCurrentSheet(entryList);
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));

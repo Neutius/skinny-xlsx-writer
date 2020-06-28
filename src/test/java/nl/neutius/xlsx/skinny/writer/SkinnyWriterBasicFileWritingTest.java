@@ -43,8 +43,6 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
     void createNewFile_fileExists() throws IOException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.createNewXlsxFile();
-
         File expectedFile = new File(targetFolder, FILE_NAME + EXTENSION);
         assertThat(expectedFile).exists();
     }
@@ -53,8 +51,6 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void createNewFile_emptyFileIsValidXlsxFile() throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-
-        writer.createNewXlsxFile();
 
         File targetFile = new File(targetFolder, FILE_NAME + EXTENSION);
         actualWorkbook = new XSSFWorkbook(targetFile);

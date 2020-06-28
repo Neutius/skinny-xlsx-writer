@@ -30,7 +30,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         List<String> secondRow = List.of("short", valueWithSeveralNewLines, "value");
         List<String> thirdRow = List.of("short", valueWithSingleNewLines, "value");
 
-        writer.createNewXlsxFile();
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
         writer.writeToFile();
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
@@ -54,7 +53,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void addSheetToWorkbook_fileHasTwoSheets(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-        writer.createNewXlsxFile();
 
         writer.addSheetToWorkbook("second sheet");
         writer.writeToFile();
@@ -73,7 +71,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     void addSeveralSheets_contentHasVaryingLength_columnWidthAdjustedForAllSheetsAndColumns(@TempDir File targetFolder)
             throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-        writer.createNewXlsxFile();
 
         writer.addRowToCurrentSheet(List.of("1", "123", "1234567", "123456789"));
         writer.addSheetToWorkbook("second sheet");
@@ -112,7 +109,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void addSheetWithEmptyStringAsName_nameIsGenerated(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-        writer.createNewXlsxFile();
 
         writer.addSheetToWorkbook("");
 
@@ -127,7 +123,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void addSheetWithNullAsName_nameIsGenerated(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-        writer.createNewXlsxFile();
 
         writer.addSheetToWorkbook(null);
 
@@ -142,7 +137,6 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void addSheetWithTooLongName_nameIsSnipped(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-        writer.createNewXlsxFile();
 
         writer.addSheetToWorkbook("abcdefghijklmnopqrstuvwxyz1234567890");
 
@@ -153,10 +147,5 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("abcdefghijklmnopqrstuvwxyz12345");
     }
-
-    /**
-     * java.lang.IllegalArgumentException: sheetName '' is invalid -
-     * character count MUST be greater than or equal to 1 and less than or equal to 31
-     */
 
 }
