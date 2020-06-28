@@ -32,9 +32,9 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
         assertThat(actualSheet.getLastRowNum()).isEqualTo(2);
 
-        assertThat(actualSheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("entry0");
-        assertThat(actualSheet.getRow(1).getCell(0).getStringCellValue()).isEqualTo("entry1");
-        assertThat(actualSheet.getRow(2).getCell(0).getStringCellValue()).isEqualTo("entry2");
+        verifyCellContent(actualSheet, 0, 0, "entry0");
+        verifyCellContent(actualSheet, 1, 0, "entry1");
+        verifyCellContent(actualSheet, 2, 0, "entry2");
     }
 
     @Test
@@ -51,9 +51,9 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
         assertThat(actualSheet.getLastRowNum()).isEqualTo(2);
 
-        assertThat(actualSheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("entry0");
-        assertThat(actualSheet.getRow(1).getCell(0).getStringCellValue()).isEqualTo("entry1");
-        assertThat(actualSheet.getRow(2).getCell(0).getStringCellValue()).isEqualTo("entry2");
+        verifyCellContent(actualSheet, 0, 0, "entry0");
+        verifyCellContent(actualSheet, 1, 0, "entry1");
+        verifyCellContent(actualSheet, 2, 0, "entry2");
     }
 
     @Test
@@ -70,28 +70,25 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         XSSFWorkbook actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
 
-        Row actualFirstRow = actualSheet.getRow(0);
-        assertThat(actualFirstRow).isNotNull().isNotEmpty().hasSize(5);
-        assertThat(actualFirstRow.getCell(0).getStringCellValue()).isEqualTo("entry0");
-        assertThat(actualFirstRow.getCell(1).getStringCellValue()).isEqualTo("1");
-        assertThat(actualFirstRow.getCell(2).getStringCellValue()).isEqualTo("?");
-        assertThat(actualFirstRow.getCell(3).getStringCellValue()).isEqualTo("Mariënberg");
-        assertThat(actualFirstRow.getCell(4).getStringCellValue()).isEqualTo("Curaçao");
+        assertThat(actualSheet.getRow(0)).isNotNull().isNotEmpty().hasSize(5);
+        verifyCellContent(actualSheet, 0, 0, "entry0");
+        verifyCellContent(actualSheet, 0, 1, "1");
+        verifyCellContent(actualSheet, 0, 2, "?");
+        verifyCellContent(actualSheet, 0, 3, "Mariënberg");
+        verifyCellContent(actualSheet, 0, 4, "Curaçao");
 
-        Row actualSecondRow = actualSheet.getRow(1);
-        assertThat(actualSecondRow).isNotNull().isNotEmpty().hasSize(4);
-        assertThat(actualSecondRow.getCell(1).getStringCellValue()).isEqualTo("false");
-        assertThat(actualSecondRow.getCell(2).getStringCellValue()).isEqualTo("true");
-        assertThat(actualSecondRow.getCell(3).getStringCellValue()).isEqualTo("null");
+        assertThat(actualSheet.getRow(1)).isNotNull().isNotEmpty().hasSize(4);
+        verifyCellContent(actualSheet, 1, 1, "false");
+        verifyCellContent(actualSheet, 1, 2, "true");
+        verifyCellContent(actualSheet, 1, 3, "null");
 
-        Row actualThirdRow = actualSheet.getRow(2);
-        assertThat(actualThirdRow).isNotNull().isNotEmpty().hasSize(6);
-        assertThat(actualThirdRow.getCell(0).getStringCellValue()).isEqualTo("entry2");
-        assertThat(actualThirdRow.getCell(1).getStringCellValue()).isEqualTo("");
-        assertThat(actualThirdRow.getCell(2).getStringCellValue()).isEqualTo("");
-        assertThat(actualThirdRow.getCell(3).getStringCellValue()).isEqualTo("");
-        assertThat(actualThirdRow.getCell(4).getStringCellValue()).isEqualTo("");
-        assertThat(actualThirdRow.getCell(5).getStringCellValue()).isEqualTo("sixth      column");
+        assertThat(actualSheet.getRow(2)).isNotNull().isNotEmpty().hasSize(6);
+        verifyCellContent(actualSheet, 2, 0, "entry2");
+        verifyCellContent(actualSheet, 2, 1, "");
+        verifyCellContent(actualSheet, 2, 2, "");
+        verifyCellContent(actualSheet, 2, 3, "");
+        verifyCellContent(actualSheet, 2, 4, "");
+        verifyCellContent(actualSheet, 2, 5, "sixth      column");
     }
 
     @Test
@@ -137,13 +134,12 @@ class SkinnyWriterTest extends AbstractSkinnyWriterTestBase {
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(1);
 
-        Row actualRow = actualSheet.getRow(0);
-        assertThat(actualRow.getCell(0).getStringCellValue()).isEqualTo("value");
-        assertThat(actualRow.getCell(1).getStringCellValue()).isEqualTo("");
-        assertThat(actualRow.getCell(2).getStringCellValue()).isEqualTo("");
-        assertThat(actualRow.getCell(3).getStringCellValue()).isEqualTo("");
-        assertThat(actualRow.getCell(4).getStringCellValue()).isEqualTo("");
-        assertThat(actualRow.getCell(5).getStringCellValue()).isEqualTo("value2");
+        verifyCellContent(actualSheet, 0, 0, "value");
+        verifyCellContent(actualSheet, 0, 1, "");
+        verifyCellContent(actualSheet, 0, 2, "");
+        verifyCellContent(actualSheet, 0, 3, "");
+        verifyCellContent(actualSheet, 0, 4, "");
+        verifyCellContent(actualSheet, 0, 5, "value2");
     }
 
     @Test
