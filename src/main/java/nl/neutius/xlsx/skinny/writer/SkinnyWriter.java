@@ -35,7 +35,7 @@ public class SkinnyWriter {
      * @param firstSheetName The name of the first sheet of the .xlsx file.
      *                       If null or an empty String is passed in, the sheet will be given a name.
      * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
-     * while be thrown upwards.
+     * will be thrown upwards.
      */
 
     public SkinnyWriter(File targetFolder, String fileName, String firstSheetName) throws IOException {
@@ -43,6 +43,20 @@ public class SkinnyWriter {
         workbook = new XSSFWorkbook();
         createNewSheet(firstSheetName);
         writeToFile();
+    }
+
+    /**
+     * Writes a new .xlsx file on the file system with all added sheets and rows, writing over any previous version.
+     * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
+     * will be thrown upwards.
+     */
+
+    public void writeToFile() throws IOException {
+        adjustColumnSizesInCurrentSheet();
+        targetFile.createNewFile();
+        FileOutputStream outputStream = new FileOutputStream(targetFile);
+        workbook.write(outputStream);
+        outputStream.close();
     }
 
     /**
@@ -57,8 +71,18 @@ public class SkinnyWriter {
         createNewSheet(sheetName);
     }
 
+    /**
+     * Creates a new row at the bottom of the current sheet.
+     * @param rowContent The Strings in this List will be added to the new row in the same order.
+     *                   If an empty List or null is passed in, the new row will remain empty.
+     */
+
     public void addRowToCurrentSheet(List<String> rowContent) {
         XSSFRow currentSheetRow = currentSheet.createRow(rowIndex++);
+
+        if (rowContent == null) {
+            return;
+        }
 
         currentColumnAmount = Math.max(rowContent.size(), currentColumnAmount);
 
@@ -69,18 +93,15 @@ public class SkinnyWriter {
         }
     }
 
+    /**
+     * Adds several new rows at the bottom of the current sheet.
+     * @param rowContentList A new row is created for each List<String> in the main List. TODO finish JavaDoc
+     */
+
     public void addSeveralRowsToCurrentSheet(List<List<String>> rowContentList) {
         for (List<String> rowContent : rowContentList) {
             addRowToCurrentSheet(rowContent);
         }
-    }
-
-    public void writeToFile() throws IOException {
-        adjustColumnSizesInCurrentSheet();
-        targetFile.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(targetFile);
-        workbook.write(outputStream);
-        outputStream.close();
     }
 
     private void createNewSheet(String sheetName) {
