@@ -26,4 +26,5 @@ abstract class AbstractSkinnyWriterTestBase {
             actualWorkbook.close();
         }
     }
+
 }

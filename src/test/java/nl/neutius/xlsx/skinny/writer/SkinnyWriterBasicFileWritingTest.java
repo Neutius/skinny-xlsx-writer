@@ -1,9 +1,6 @@
 package nl.neutius.xlsx.skinny.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +9,6 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
