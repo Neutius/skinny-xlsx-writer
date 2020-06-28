@@ -31,12 +31,25 @@ public class SkinnyWriter {
         writeToFile();
     }
 
+    public void addSheetToWorkbook(String sheetName) {
+        adjustCellSizesInCurrentSheet();
+        createNewSheet(sheetName);
+    }
+
     private void createNewSheet(String sheetName) {
-        currentSheet = workbook.createSheet(sheetName);
+        currentSheet = workbook.createSheet(sanitizeSheetName(sheetName));
         currentCellStyle = workbook.createCellStyle();
         currentCellStyle.setWrapText(false);
         currentColumnAmount = 0;
         rowIndex = 0;
+    }
+
+    private String sanitizeSheetName(String sheetName) {
+        if (sheetName == null ||sheetName.isEmpty()) {
+            int newSheetNumber = workbook.getNumberOfSheets() + 1;
+            return "Sheet_" + newSheetNumber;
+        }
+        return sheetName;
     }
 
     public void addRowToCurrentSheet(List<String> rowContent) {
@@ -74,5 +87,4 @@ public class SkinnyWriter {
 
         currentCellStyle.setWrapText(true);
     }
-
 }
