@@ -95,7 +95,9 @@ public class SkinnyWriter {
 
     /**
      * Adds several new rows at the bottom of the current sheet.
-     * @param rowContentList A new row is created for each List<String> in the main List. TODO finish JavaDoc
+     * Calls <code> public void addRowToCurrentSheet(List<String> rowContent) </code> once for each
+     * <code> List<String> </code> in the main <code> List<List<String>> </code>.
+     * @param rowContentList The content to be te added to the current sheet.
      */
 
     public void addSeveralRowsToCurrentSheet(List<List<String>> rowContentList) {
