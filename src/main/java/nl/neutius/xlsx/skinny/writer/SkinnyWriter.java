@@ -17,9 +17,14 @@ public class SkinnyWriter {
 
     private XSSFWorkbook workbook;
     private XSSFCellStyle currentCellStyle;
+    private XSSFFont columnHeaderFont = new XSSFFont();
     private XSSFSheet currentSheet;
     private int currentColumnAmount;
     private int rowIndex;
+
+    {
+        columnHeaderFont.setBold(true);
+    }
 
     /**
      * Calling this constructor will initialize an in memory Workbook with a single empty Sheet, which will be
@@ -69,6 +74,42 @@ public class SkinnyWriter {
     public void addSheetToWorkbook(String sheetName) {
         adjustColumnSizesInCurrentSheet();
         createNewSheet(sheetName);
+    }
+
+    /**
+     * Adds a row at the top of the current sheet, and adds the parameter values to this row. This row is unique in three ways:
+     * 1. Column header text will be given a bold font.
+     * 2. A freeze pane will be applied to the column header row.
+     * 3. Line wrapping is disabled for column header cells.
+     *
+     * Adding column headers to a sheet is optional.
+     *
+     * Column headers should be added first and only once:
+     *      Any attempt to add column headers to a non-empty sheet will result in an IllegalStateException.
+     *
+     * Column header text should consist of at least 1 non white space character:
+     *      If the parameter contains any null values, a NullPointerException will occur.
+     *      If the parameter contains any blank Strings, an IllegalArgumentException will be thrown.
+     *
+     * @param columnHeaderRow The List of String values to be added to the column header row.
+     */
+    public void addColumnHeaderRowToCurrentSheet(List<String> columnHeaderRow) {
+        if (currentSheet.getRow(0) != null) {
+            throw new IllegalStateException("Column headers should be added first, and should be added only once.");
+        }
+        if (columnHeaderRow.stream().anyMatch(String::isBlank)) {
+            throw new IllegalArgumentException("Column header text should not be blank");
+        }
+
+        XSSFRow headerColumnRow = currentSheet.createRow(rowIndex++);
+
+        for (int columnIndex = 0; columnIndex < columnHeaderRow.size(); columnIndex++) {
+            XSSFCell currentCell = headerColumnRow.createCell(columnIndex);
+
+            currentCell.setCellValue(applyColumnHeaderFont(columnHeaderRow.get(columnIndex)));
+        }
+
+        currentSheet.createFreezePane(0, 1);
     }
 
     /**
@@ -140,5 +181,11 @@ public class SkinnyWriter {
         }
 
         currentCellStyle.setWrapText(true);
+    }
+
+    private XSSFRichTextString applyColumnHeaderFont(String originalValue) {
+        XSSFRichTextString richValue = new XSSFRichTextString(originalValue);
+        richValue.applyFont(columnHeaderFont);
+        return richValue;
     }
 }
