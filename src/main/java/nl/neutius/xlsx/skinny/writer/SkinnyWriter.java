@@ -71,6 +71,34 @@ public class SkinnyWriter {
     }
 
     /**
+     * Convenience method to a sheet with headers and content to the .xlsx file.  Calls several basic method of this class.
+     * @param sheetName The name of the sheet to be added to the .xlsx file.
+     *                  If null or an empty String is passed in, the sheet will be given a name.
+     * @param sheetContent The content to be te added to the new sheet.
+     */
+
+    public void addSheetWithContentToWorkbook(String sheetName, List<List<String>> sheetContent) {
+        addSheetToWorkbook(sheetName);
+        addSeveralRowsToCurrentSheet(sheetContent);
+    }
+
+    /**
+     * Convenience method to a sheet with headers and content to the .xlsx file. Calls several basic method of this class.
+     * @param sheetName The name of the sheet to be added to the .xlsx file.
+     *                  If null or an empty String is passed in, the sheet will be given a name.
+     * @param sheetHeadersAndContent The first List<String> entry will be added as a column header row to the new sheet,
+     *                               every entry after the first will be added as a content row.
+     */
+
+    public void addSheetWithHeadersAndContentToWorkbook(String sheetName, List<List<String>> sheetHeadersAndContent) {
+        addSheetToWorkbook(sheetName);
+        addColumnHeaderRowToCurrentSheet(sheetHeadersAndContent.get(0));
+        for (int index = 1; index < sheetHeadersAndContent.size(); index++) {
+            addRowToCurrentSheet(sheetHeadersAndContent.get(index));
+        }
+    }
+
+    /**
      * Add a new sheet to the .xlsx file.
      *
      * @param sheetName The name of the sheet to be added to the .xlsx file.
