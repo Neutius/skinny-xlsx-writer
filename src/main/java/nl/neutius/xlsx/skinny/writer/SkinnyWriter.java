@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class SkinnyWriter {
 
@@ -80,6 +81,17 @@ public class SkinnyWriter {
     public void addSheetWithContentToWorkbook(String sheetName, List<List<String>> sheetContent) {
         addSheetToWorkbook(sheetName);
         addSeveralRowsToCurrentSheet(sheetContent);
+    }
+
+    /**
+     * Convenience method that call @addSheetWithContentToWork once for each entry.
+     * @param sheetNameAndContentMap For each entry in this map, a sheet will be added to the .xlsx file.
+     *                               The key of each entry will be the name of the new sheet.
+     *                               The value of each entry will be the content of the corresponding sheet.
+     */
+
+    public void addSeveralSheetsWithContentToWorkbook(Map<String, List<List<String>>> sheetNameAndContentMap) {
+        sheetNameAndContentMap.entrySet().forEach((entry) -> addSheetWithContentToWorkbook(entry.getKey(), entry.getValue()));
     }
 
     /**
