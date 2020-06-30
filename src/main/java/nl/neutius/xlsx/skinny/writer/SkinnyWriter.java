@@ -1,6 +1,12 @@
 package nl.neutius.xlsx.skinny.writer;
 
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +46,7 @@ public class SkinnyWriter {
      * @param firstSheetName The name of the first sheet of the .xlsx file.
      *                       If null or an empty String is passed in, the sheet will be given a name.
      * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
-     * will be thrown upwards.
+     * will remain uncaught.
      */
 
     public SkinnyWriter(File targetFolder, String fileName, String firstSheetName) throws IOException {
@@ -53,7 +59,7 @@ public class SkinnyWriter {
     /**
      * Writes a new .xlsx file on the file system with all added sheets and rows, writing over any previous version.
      * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
-     * will be thrown upwards.
+     * will remain uncaught.
      */
 
     public void writeToFile() throws IOException {
@@ -88,7 +94,7 @@ public class SkinnyWriter {
      *      Any attempt to add column headers to a non-empty sheet will result in an IllegalStateException.
      *
      * Column header text should consist of at least 1 non white space character:
-     *      If the parameter contains any null values, a NullPointerException will occur.
+     *      If the parameter contains any null values, a NullPointerException will occur and remain uncaught.
      *      If the parameter contains any blank Strings, an IllegalArgumentException will be thrown.
      *
      * @param columnHeaderRow The List of String values to be added to the column header row.
@@ -145,6 +151,18 @@ public class SkinnyWriter {
         for (List<String> rowContent : rowContentList) {
             addRowToCurrentSheet(rowContent);
         }
+    }
+
+    /**
+     * Only information considered useful for debugging or logging is included.
+     * @return A String representation, containing the target .xlsx file, the current amount of sheets, and the amount of rows and
+     * columns on the current sheet.
+     */
+
+    @Override
+    public String toString() {
+        return String.format("SkinnyWriter - target .xlsx file: %s - current amount of sheets: %s - current sheet has %s rows and "
+                + "%s columns", targetFile, workbook.getNumberOfSheets(), currentSheet.getPhysicalNumberOfRows(), currentColumnAmount);
     }
 
     private void createNewSheet(String sheetName) {
