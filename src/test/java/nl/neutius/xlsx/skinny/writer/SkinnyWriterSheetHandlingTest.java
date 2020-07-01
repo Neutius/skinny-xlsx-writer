@@ -3,7 +3,6 @@ package nl.neutius.xlsx.skinny.writer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -19,6 +18,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     @Test
     void valuesWithDifferentLengthAndHeight_columnWidthIsAdjusted(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
         String longValue = "we like writing an entire book in a single cell within a bigger spreadsheet, " +
                 "also, we \t like \t tabs \t\t\t too \t much";
         String valueWithSpecialCharacters = " \\ \\ \" \" ; || ;; | , . \" ";
@@ -28,11 +28,9 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         List<String> firstRow = List.of("short", "value", valueWithSpecialCharacters, longValue);
         List<String> secondRow = List.of("short", valueWithSeveralNewLines, "value");
         List<String> thirdRow = List.of("short", valueWithSingleNewLines, "value");
-
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
+        writeAndReadActualWorkbook(targetFolder);
         Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(3);
 
@@ -54,9 +52,8 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
         writer.addSheetToWorkbook("second sheet");
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).hasSize(2);
         assertThat(actualWorkbook.getSheetAt(0)).isNotNull().hasSize(0);
         assertThat(actualWorkbook.getSheetAt(1)).isNotNull().hasSize(0);
@@ -77,9 +74,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addSheetToWorkbook("third sheet");
         writer.addRowToCurrentSheet(List.of("123456789", "1234567", "1", "123"));
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).hasSize(3);
 
         XSSFSheet firstSheet = actualWorkbook.getSheet(SHEET_NAME);
@@ -111,9 +106,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
 
         writer.addSheetToWorkbook("");
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(2);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("Sheet_2");
@@ -125,9 +118,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
 
         writer.addSheetToWorkbook(null);
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(2);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("Sheet_2");
@@ -139,9 +130,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
 
         writer.addSheetToWorkbook("abcdefghijklmnopqrstuvwxyz1234567890");
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(2);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("abcdefghijklmnopqrstuvwxyz12345");

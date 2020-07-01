@@ -4,7 +4,6 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -26,9 +25,8 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
         String sheetName = "second sheet";
         List<List<String>> sheetContent = List.of(List.of("11", "12"), List.of("21", "22"));
         writer.addSheetWithContentToWorkbook(sheetName, sheetContent);
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).hasSize(2);
         assertThatThrownBy(() -> actualWorkbook.getSheetAt(2)).isInstanceOf(IllegalArgumentException.class);
 
@@ -51,9 +49,8 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
 
         List<List<String>> sheetContent = List.of(List.of("11", "12"), List.of("21", "22"));
         writer.addSheetWithHeadersAndContentToWorkbook("second sheet", sheetContent);
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).hasSize(2);
         assertThatThrownBy(() -> actualWorkbook.getSheetAt(2)).isInstanceOf(IllegalArgumentException.class);
 
@@ -85,22 +82,19 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
     }
 
     @Test
-    void addSeveralSheetsWithContentToWorkbook_fileHasTwoSheets(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+    void addSeveralSheetsWithContentToWorkbook_fileHasSeveralSheets(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
         String secondSheetName = "second sheet";
         List<List<String>> secondSheetContent = List.of(List.of("11", "12"), List.of("21", "22"));
         String thirdSheetName = "third sheet";
         List<List<String>> thirdSheetContent = List.of(List.of("A", "B"), List.of("C", "D"));
-
         Map<String, List<List<String>>> sheetNameAndContentMap = new HashMap<>();
         sheetNameAndContentMap.put(secondSheetName, secondSheetContent);
         sheetNameAndContentMap.put(thirdSheetName, thirdSheetContent);
-
         writer.addSeveralSheetsWithContentToWorkbook(sheetNameAndContentMap);
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
 
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).hasSize(3);
 
         XSSFSheet firstSheet = actualWorkbook.getSheetAt(0);

@@ -22,9 +22,7 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addSheetToWorkbook(SHEET_NAME);
         writer.addSheetToWorkbook(SHEET_NAME);
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(3);
     }
 
@@ -35,9 +33,7 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addSheetToWorkbook(SHEET_NAME);
         writer.addSheetToWorkbook(SHEET_NAME);
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isNotNull().isNotEmpty().contains(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isNotNull().isNotEmpty().contains(SHEET_NAME);
         assertThat(actualWorkbook.getSheetAt(2).getSheetName()).isNotNull().isNotEmpty().contains(SHEET_NAME);
@@ -53,7 +49,6 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, "new sheet");
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(1);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo("new sheet");
     }
@@ -109,10 +104,8 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(emptyList);
         writer.addRowToCurrentSheet(List.of("content", "content", "content"));
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        writeAndReadActualWorkbook(targetFolder);
         XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
-
         assertThat(actualSheet).hasSize(4);
         assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(3);
         assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(0);
@@ -129,10 +122,8 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(null);
         writer.addRowToCurrentSheet(List.of("content", "content", "content"));
 
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        writeAndReadActualWorkbook(targetFolder);
         XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
-
         assertThat(actualSheet).hasSize(4);
         assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(3);
         assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(0);
@@ -156,9 +147,8 @@ class SkinnyWriterErrorHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.writeToFile();
         writer.writeToFile();
         writer.writeToFile();
-        writer.writeToFile();
-
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        
+        writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(3);
         assertThat(actualWorkbook.getSheetAt(0)).hasSize(2);
         assertThat(actualWorkbook.getSheetAt(1)).hasSize(2);

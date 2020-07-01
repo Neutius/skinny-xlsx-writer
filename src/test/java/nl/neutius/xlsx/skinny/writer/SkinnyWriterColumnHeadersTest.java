@@ -4,7 +4,6 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -24,11 +23,9 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
 
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
-        PaneInformation paneInformation = actualSheet.getPaneInformation();
 
+        writeAndReadActualWorkbook(targetFolder);
+        PaneInformation paneInformation = actualWorkbook.getSheetAt(0).getPaneInformation();
         assertThat(paneInformation).isNotNull();
         assertThat(paneInformation.isFreezePane()).isTrue();
         assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
@@ -42,10 +39,9 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
 
+        writeAndReadActualWorkbook(targetFolder);
+        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
         assertThat(actualSheet).hasSize(3);
         assertThat(actualSheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("column header");
         assertThat(actualSheet.getRow(1).getCell(0).getStringCellValue()).isEqualTo("normal cell content");
@@ -58,10 +54,9 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
 
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
 
+        writeAndReadActualWorkbook(targetFolder);
+        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
         XSSFRichTextString headerCellValue = actualSheet.getRow(0).getCell(0).getRichStringCellValue();
         assertThat(headerCellValue.getFontAtIndex(2)).isNotNull();
         assertThat(headerCellValue.getFontAtIndex(2).getBold()).isTrue();
@@ -73,11 +68,10 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
 
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
 
-        XSSFRichTextString contentCellValue = actualSheet.getRow(1).getCell(0).getRichStringCellValue();
+        writeAndReadActualWorkbook(targetFolder);
+        XSSFRichTextString contentCellValue
+                = actualWorkbook.getSheetAt(0).getRow(1).getCell(0).getRichStringCellValue();
         assertThat(contentCellValue.getFontAtIndex(2)).isNull();
     }
 
@@ -87,10 +81,9 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
 
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
-        writer.writeToFile();
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
 
+        writeAndReadActualWorkbook(targetFolder);
+        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
         assertThat(actualSheet.getRow(0).getCell(0).getCellStyle().getWrapText()).isFalse();
         assertThat(actualSheet.getRow(1).getCell(0).getCellStyle().getWrapText()).isTrue();
     }
