@@ -93,7 +93,7 @@ public class SkinnyWriter {
      */
 
     public void addSeveralSheetsWithContentToWorkbook(Map<String, List<List<String>>> sheetNameAndContentMap) {
-        sheetNameAndContentMap.entrySet().forEach((entry) -> addSheetWithContentToWorkbook(entry.getKey(), entry.getValue()));
+        sheetNameAndContentMap.forEach(this::addSheetWithContentToWorkbook);
     }
 
     /**
@@ -110,6 +110,14 @@ public class SkinnyWriter {
         for (int index = 1; index < sheetHeadersAndContent.size(); index++) {
             addRowToCurrentSheet(sheetHeadersAndContent.get(index));
         }
+    }
+
+    /**
+     * TODO write JavaDoc
+     * @param sheetNameAndHeadersAndContentMap
+     */
+    public void addSeveralSheetsWithHeadersAndContentToWorkbook(Map<String, List<List<String>>> sheetNameAndHeadersAndContentMap) {
+        sheetNameAndHeadersAndContentMap.forEach(this::addSheetWithHeadersAndContentToWorkbook);
     }
 
     /**

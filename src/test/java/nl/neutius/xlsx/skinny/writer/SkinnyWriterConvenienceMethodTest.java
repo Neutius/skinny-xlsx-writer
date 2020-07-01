@@ -68,19 +68,7 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
         assertThat(secondSheet.getRow(1).getCell(0).getStringCellValue()).isEqualTo("21");
         assertThat(secondSheet.getRow(1).getCell(1).getStringCellValue()).isEqualTo("22");
 
-        XSSFCell contentCell = secondSheet.getRow(1).getCell(0);
-        assertThat(contentCell.getRichStringCellValue().getFontAtIndex(0)).isNull();
-        assertThat(contentCell.getCellStyle().getWrapText()).isTrue();
-
-        XSSFCell headerCell = secondSheet.getRow(0).getCell(0);
-        assertThat(headerCell.getRichStringCellValue().getFontAtIndex(0).getBold()).isTrue();
-        assertThat(headerCell.getCellStyle().getWrapText()).isFalse();
-
-        PaneInformation paneInformation = secondSheet.getPaneInformation();
-        assertThat(paneInformation).isNotNull();
-        assertThat(paneInformation.isFreezePane()).isTrue();
-        assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
-        assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
+        assertColumnHeaderRowAndContentRow(secondSheet);
     }
 
     @Test
@@ -139,6 +127,57 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualWorkbook.getSheetAt(6).getSheetName()).isEqualTo("seventh sheet");
         assertThat(actualWorkbook.getSheetAt(7).getSheetName()).isEqualTo("eighth sheet");
         assertThat(actualWorkbook.getSheetAt(8).getSheetName()).isEqualTo("ninth sheet");
+    }
+
+    @Test
+    void addSeveralSheetsWithHeadersAndContentToWorkbook_allSheetsPresentWithHeadersAndContent(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
+        Map<String, List<List<String>>> sheetNameAndHeadersAndContentMap = new LinkedHashMap<>();
+        sheetNameAndHeadersAndContentMap.put("second sheet",
+                List.of(List.of("Header1", "Header2"), List.of("Content1", "Content2")));
+        sheetNameAndHeadersAndContentMap.put("third sheet",
+                List.of(List.of("Header1", "Header2"), List.of("Content1", "Content2")));
+        sheetNameAndHeadersAndContentMap.put("fourth sheet",
+                List.of(List.of("Header1", "Header2"), List.of("Content1", "Content2")));
+        sheetNameAndHeadersAndContentMap.put(null,
+                List.of(List.of("Header1", "Header2"), List.of("Content1", "Content2")));
+        writer.addSeveralSheetsWithHeadersAndContentToWorkbook(sheetNameAndHeadersAndContentMap);
+
+        writeAndReadActualWorkbook(targetFolder);
+        assertThat(actualWorkbook).hasSize(5);
+        assertSheetWithColumnHeaderRowAndContentRow(actualWorkbook.getSheetAt(1), "second sheet", 2);
+        assertSheetWithColumnHeaderRowAndContentRow(actualWorkbook.getSheetAt(2), "third sheet", 2);
+        assertSheetWithColumnHeaderRowAndContentRow(actualWorkbook.getSheetAt(3), "fourth sheet", 2);
+
+        XSSFSheet fifthSheet = actualWorkbook.getSheetAt(4);
+        assertThat(fifthSheet).isNotNull().hasSize(2);
+        assertThat(fifthSheet.getSheetName()).isNotNull().isNotBlank().isNotEqualTo("null");
+        assertColumnHeaderRowAndContentRow(fifthSheet);
+    }
+
+    private void assertSheetWithColumnHeaderRowAndContentRow(XSSFSheet actualSheet, String expectedSheetName, int expectedSheetSize) {
+        assertThat(actualSheet).isNotNull().hasSize(expectedSheetSize);
+        assertThat(actualSheet.getSheetName()).isEqualTo(expectedSheetName);
+
+        assertColumnHeaderRowAndContentRow(actualSheet);
+    }
+
+    private void assertColumnHeaderRowAndContentRow(XSSFSheet actualSheet) {
+        XSSFCell contentCell = actualSheet.getRow(1).getCell(0);
+        assertThat(contentCell.getRichStringCellValue().getFontAtIndex(0)).isNull();
+        assertThat(contentCell.getCellStyle().getWrapText()).isTrue();
+
+        XSSFCell headerCell = actualSheet.getRow(0).getCell(0);
+        assertThat(headerCell.getRichStringCellValue().getFontAtIndex(0).getBold()).isTrue();
+        assertThat(headerCell.getCellStyle().getWrapText()).isFalse();
+
+        PaneInformation paneInformation = actualSheet.getPaneInformation();
+        assertThat(paneInformation).isNotNull();
+        assertThat(paneInformation.isFreezePane()).isTrue();
+        assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
+        assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
     }
 
 }
