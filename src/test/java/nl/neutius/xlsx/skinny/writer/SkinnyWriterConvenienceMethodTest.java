@@ -1,6 +1,7 @@
 package nl.neutius.xlsx.skinny.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,6 +111,34 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
         assertThat(thirdSheet).isNotNull().hasSize(2);
         assertThat(thirdSheet.getSheetName()).isEqualTo("third sheet");
         assertThat(thirdSheet.getPhysicalNumberOfRows()).isEqualTo(2);
+    }
+
+    @Test
+    void addSeveralSheetsWithContentInLinkedHashMap_fileHasSameSheetsInSameOrder(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
+        Map<String, List<List<String>>> sheetNameAndContentMap = new LinkedHashMap<>(4);
+        sheetNameAndContentMap.put("second sheet", List.of(List.of("2")));
+        sheetNameAndContentMap.put("third sheet", List.of(List.of("3")));
+        sheetNameAndContentMap.put("fourth sheet", List.of(List.of("4")));
+        sheetNameAndContentMap.put(null, List.of(List.of("null")));
+        sheetNameAndContentMap.put("sixth sheet", List.of(List.of("6")));
+        sheetNameAndContentMap.put("seventh sheet", null);
+        sheetNameAndContentMap.put("eighth sheet", List.of(List.of("8")));
+        sheetNameAndContentMap.put("ninth sheet", List.of(List.of("9")));
+        writer.addSeveralSheetsWithContentToWorkbook(sheetNameAndContentMap);
+
+        writeAndReadActualWorkbook(targetFolder);
+        assertThat(actualWorkbook).hasSize(9);
+        assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
+        assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("second sheet");
+        assertThat(actualWorkbook.getSheetAt(2).getSheetName()).isEqualTo("third sheet");
+        assertThat(actualWorkbook.getSheetAt(3).getSheetName()).isEqualTo("fourth sheet");
+        assertThat(actualWorkbook.getSheetAt(4).getSheetName()).isNotNull().isNotBlank().isNotEqualTo("null");
+        assertThat(actualWorkbook.getSheetAt(5).getSheetName()).isEqualTo("sixth sheet");
+        assertThat(actualWorkbook.getSheetAt(6).getSheetName()).isEqualTo("seventh sheet");
+        assertThat(actualWorkbook.getSheetAt(7).getSheetName()).isEqualTo("eighth sheet");
+        assertThat(actualWorkbook.getSheetAt(8).getSheetName()).isEqualTo("ninth sheet");
     }
 
 }

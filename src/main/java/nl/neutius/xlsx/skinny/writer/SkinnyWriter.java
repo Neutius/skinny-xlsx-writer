@@ -80,7 +80,9 @@ public class SkinnyWriter {
 
     public void addSheetWithContentToWorkbook(String sheetName, List<List<String>> sheetContent) {
         addSheetToWorkbook(sheetName);
-        addSeveralRowsToCurrentSheet(sheetContent);
+        if (sheetContent != null) {
+            addSeveralRowsToCurrentSheet(sheetContent);
+        }
     }
 
     /**
