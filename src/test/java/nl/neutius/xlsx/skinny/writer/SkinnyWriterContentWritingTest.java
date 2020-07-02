@@ -17,36 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
 
     @Test
-    void addContent_fileHasContent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
-        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
-
-        writer.addRowToCurrentSheet(List.of("entry"));
-
-        writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
-        assertThat(actualSheet).isNotEmpty();
-        assertThat(actualSheet).hasSize(1);
-        assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
-        assertThat(actualSheet.getLastRowNum()).isEqualTo(0);
-
-        Row actualRow = actualSheet.getRow(0);
-        assertThat(actualRow).isNotNull();
-        assertThat(actualRow).isNotEmpty();
-        assertThat(actualRow).hasSize(1);
-        assertThat((int) actualRow.getFirstCellNum()).isEqualTo(0);
-        assertThat((int) actualRow.getLastCellNum()).isEqualTo(1);
-        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
-        assertThat(actualRow.getRowNum()).isEqualTo(0);
-
-        Cell actualCell = actualRow.getCell(0);
-        assertThat(actualCell).isNotNull();
-        assertThat(actualCell.getSheet()).isEqualTo(actualSheet);
-        assertThat(actualCell.getStringCellValue()).isEqualTo("entry");
-        assertThat(actualCell.getColumnIndex()).isEqualTo(0);
-        assertThat(actualCell.getRowIndex()).isEqualTo(0);
-    }
-
-    @Test
     void addSeveralRows_allRowsArePresent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
@@ -160,6 +130,36 @@ public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase
         verifyCellContent(actualSheet, 0, 3, "");
         verifyCellContent(actualSheet, 0, 4, "");
         verifyCellContent(actualSheet, 0, 5, "value2");
+    }
+
+    @Test
+    void addContent_fileHasContent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
+        writer.addRowToCurrentSheet(List.of("entry"));
+
+        writeAndReadActualWorkbook(targetFolder);
+        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet).isNotEmpty();
+        assertThat(actualSheet).hasSize(1);
+        assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
+        assertThat(actualSheet.getLastRowNum()).isEqualTo(0);
+
+        Row actualRow = actualSheet.getRow(0);
+        assertThat(actualRow).isNotNull();
+        assertThat(actualRow).isNotEmpty();
+        assertThat(actualRow).hasSize(1);
+        assertThat((int) actualRow.getFirstCellNum()).isEqualTo(0);
+        assertThat((int) actualRow.getLastCellNum()).isEqualTo(1);
+        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
+        assertThat(actualRow.getRowNum()).isEqualTo(0);
+
+        Cell actualCell = actualRow.getCell(0);
+        assertThat(actualCell).isNotNull();
+        assertThat(actualCell.getSheet()).isEqualTo(actualSheet);
+        assertThat(actualCell.getStringCellValue()).isEqualTo("entry");
+        assertThat(actualCell.getColumnIndex()).isEqualTo(0);
+        assertThat(actualCell.getRowIndex()).isEqualTo(0);
     }
 
     void verifyCellContent(Sheet actualSheet, int rowIndex, int columnIndex, String expectedCellContent) {
