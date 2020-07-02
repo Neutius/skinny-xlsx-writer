@@ -1,4 +1,4 @@
-package nl.neutius.xlsx.skinny.writer;
+package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
