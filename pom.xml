@@ -9,6 +9,31 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>A simple and light-weight .xlsx writer.</description>
+    <url>https://github.com/Neutius/skinny-xlsx-writer</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Gijs vdNL</name>
+            <url>https://github.com/Neutius</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/Neutius/skinny-xlsx-writer.git</connection>
+        <developerConnection>scm:git:ssh://github.com/Neutius/skinny-xlsx-writer.git</developerConnection>
+        <url>https://github.com/Neutius/skinny-xlsx-writer</url>
+    </scm>
+
+
     <properties>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
@@ -99,6 +124,21 @@
                             <failOnError>true</failOnError>
                             <failOnWarnings>false</failOnWarnings>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
