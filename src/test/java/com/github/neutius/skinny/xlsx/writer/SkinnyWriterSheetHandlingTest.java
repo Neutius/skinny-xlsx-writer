@@ -1,7 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -31,7 +30,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(3);
 
         int firstColumnWidth = actualSheet.getColumnWidth(0);

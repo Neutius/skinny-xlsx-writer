@@ -1,9 +1,9 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
 
@@ -25,7 +26,7 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(List.of("entry2"));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).hasSize(3);
         assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
         assertThat(actualSheet.getLastRowNum()).isEqualTo(2);
@@ -42,7 +43,7 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addSeveralRowsToCurrentSheet(List.of(List.of("entry0"), List.of("entry1"), List.of("entry2")));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).hasSize(3);
         assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
         assertThat(actualSheet.getLastRowNum()).isEqualTo(2);
@@ -62,22 +63,22 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
 
-        assertThat(actualSheet.getRow(0)).isNotNull().isNotEmpty().hasSize(5);
+        assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(5);
         verifyCellContent(actualSheet, 0, 0, "entry0");
         verifyCellContent(actualSheet, 0, 1, "1");
         verifyCellContent(actualSheet, 0, 2, "?");
         verifyCellContent(actualSheet, 0, 3, "Mariënberg");
         verifyCellContent(actualSheet, 0, 4, "Curaçao");
 
-        assertThat(actualSheet.getRow(1)).isNotNull().isNotEmpty().hasSize(4);
+        assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(4);
         verifyCellContent(actualSheet, 1, 0, "entry1");
         verifyCellContent(actualSheet, 1, 1, "false");
         verifyCellContent(actualSheet, 1, 2, "true");
         verifyCellContent(actualSheet, 1, 3, "null");
 
-        assertThat(actualSheet.getRow(2)).isNotNull().isNotEmpty().hasSize(6);
+        assertThat(actualSheet.getRow(2).getPhysicalNumberOfCells()).isEqualTo(6);
         verifyCellContent(actualSheet, 2, 0, "entry2");
         verifyCellContent(actualSheet, 2, 1, "");
         verifyCellContent(actualSheet, 2, 2, "");
@@ -96,12 +97,13 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(List.of(valueWithTabs, valueWithNewLines, valueWithSpecialCharacters));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(actualSheet.getRow(1)).isNull();
+        assertThatThrownBy(() -> actualSheet.getRow(1).getPhysicalNumberOfCells())
+                .isInstanceOf(NullPointerException.class);
 
-        Row actualRow = actualSheet.getRow(0);
-        assertThat(actualRow).isNotNull().isNotEmpty().hasSize(3);
+        XSSFRow actualRow = actualSheet.getRow(0);
+        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(3);
         assertThat(actualRow.getCell(0).getStringCellValue()).isEqualTo(valueWithTabs);
         assertThat(actualRow.getCell(1).getStringCellValue()).isEqualTo(valueWithNewLines);
         assertThat(actualRow.getCell(2).getStringCellValue()).isEqualTo(valueWithSpecialCharacters);
@@ -122,7 +124,7 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(entryList);
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(1);
         verifyCellContent(actualSheet, 0, 0, "value");
         verifyCellContent(actualSheet, 0, 1, "");
@@ -139,22 +141,20 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(List.of("entry"));
 
         writeAndReadActualWorkbook(targetFolder);
-        Sheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotEmpty();
         assertThat(actualSheet).hasSize(1);
         assertThat(actualSheet.getFirstRowNum()).isEqualTo(0);
         assertThat(actualSheet.getLastRowNum()).isEqualTo(0);
 
-        Row actualRow = actualSheet.getRow(0);
-        assertThat(actualRow).isNotNull();
-        assertThat(actualRow).isNotEmpty();
-        assertThat(actualRow).hasSize(1);
+        XSSFRow actualRow = actualSheet.getRow(0);
+        assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
         assertThat((int) actualRow.getFirstCellNum()).isEqualTo(0);
         assertThat((int) actualRow.getLastCellNum()).isEqualTo(1);
         assertThat(actualRow.getPhysicalNumberOfCells()).isEqualTo(1);
         assertThat(actualRow.getRowNum()).isEqualTo(0);
 
-        Cell actualCell = actualRow.getCell(0);
+        XSSFCell actualCell = actualRow.getCell(0);
         assertThat(actualCell).isNotNull();
         assertThat(actualCell.getSheet()).isEqualTo(actualSheet);
         assertThat(actualCell.getStringCellValue()).isEqualTo("entry");
@@ -162,7 +162,7 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualCell.getRowIndex()).isEqualTo(0);
     }
 
-    void verifyCellContent(Sheet actualSheet, int rowIndex, int columnIndex, String expectedCellContent) {
+    void verifyCellContent(XSSFSheet actualSheet, int rowIndex, int columnIndex, String expectedCellContent) {
         assertThat(actualSheet.getRow(rowIndex).getCell(columnIndex).getStringCellValue()).isEqualTo(expectedCellContent);
     }
 }
