@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
+class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
 
     @Test
     void addSeveralRows_allRowsArePresent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
