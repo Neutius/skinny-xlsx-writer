@@ -20,6 +20,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
 
     @Test
+    void callToStringOverride_containsRelevantInformation(@TempDir File targetFolder) throws IOException {
+        File expectedFile = new File(targetFolder, FILE_NAME + EXTENSION);
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+
+        assertThat(writer.toString()).isNotNull().isNotBlank().contains(FILE_NAME)
+                .isEqualTo("SkinnyWriter - target .xlsx file: " + expectedFile.toString() +
+                        " - current amount of sheets: 1 - current sheet has 0 rows and 0 columns");
+    }
+
+    @Test
+    void callToStringOverride_containsUpdatedInformation(@TempDir File targetFolder) throws IOException {
+        File expectedFile = new File(targetFolder, FILE_NAME + EXTENSION);
+        writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
+        writer.addSheetWithContentToWorkbook("Sheet2", List.of(List.of("A", "B", "C"), List.of("1", "2", "3")));
+
+        assertThat(writer.toString()).isEqualTo("SkinnyWriter - target .xlsx file: " + expectedFile.toString() +
+                " - current amount of sheets: 2 - current sheet has 2 rows and 3 columns");
+    }
+
+    @Test
     void addSheetAndContentToWorkbook_fileHasTwoSheets(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
