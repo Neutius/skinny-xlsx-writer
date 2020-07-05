@@ -6,7 +6,7 @@
 
     <groupId>com.github.neutius</groupId>
     <artifactId>skinny-xlsx-writer</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>bundle</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -32,7 +32,6 @@
         <developerConnection>scm:git:ssh://github.com/Neutius/skinny-xlsx-writer.git</developerConnection>
         <url>https://github.com/Neutius/skinny-xlsx-writer</url>
     </scm>
-
 
     <properties>
         <maven.compiler.target>11</maven.compiler.target>
@@ -82,6 +81,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -165,6 +175,18 @@
                         <Import-Package>*</Import-Package>
                     </instructions>
                     <niceManifest>true</niceManifest>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
 
