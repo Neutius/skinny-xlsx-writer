@@ -18,11 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SkinnyWriterInterfaceHandlingTest extends AbstractSkinnyWriterTestBase {
 
-    private final List<List<String>> contentRows = List.of(List.of("A1", "A2"), List.of("B1", "B2"));
-    private final List<String> columnHeaders = List.of("Header1", "Header2");
+    protected final List<List<String>> contentRows = List.of(List.of("A1", "A2"), List.of("B1", "B2"));
+    protected final List<String> columnHeaders = List.of("Header1", "Header2");
 
-    private SkinnySheetContent firstSheetContent;
-    private XSSFSheet actualSheet;
+    protected SkinnySheetContent firstSheetContent;
+    protected XSSFSheet actualSheet;
 
     @Test
     void addSheetWithNameAndContent_fileHasSheet(@TempDir File targetFolder) throws IOException, InvalidFormatException {
@@ -51,6 +51,13 @@ class SkinnyWriterInterfaceHandlingTest extends AbstractSkinnyWriterTestBase {
     }
 
     @Test
+    void addSheetWithNameAndContent_sheetHasNoHeaders(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+        setupWithoutHeaders(targetFolder);
+
+        verifyNoColumnHeaders(actualSheet);
+    }
+
+    @Test
     void addSheetWithNameAndHeadersAndContent_sheetHasCorrectSize(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         setUpWithHeaders(targetFolder);
 
@@ -71,37 +78,14 @@ class SkinnyWriterInterfaceHandlingTest extends AbstractSkinnyWriterTestBase {
     }
 
     @Test
-    void addSheetWithNameAndHeadersAndContent_sheetHasCorrectHeaders(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+    void addSheetWithNameAndHeadersAndContent_sheetHasCorrectHeaders(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
         setUpWithHeaders(targetFolder);
 
         verifyCellContent(actualSheet, 0, 0, "Header1");
         verifyCellContent(actualSheet, 0, 1, "Header2");
 
-        verifyFreezePane(actualSheet);
-        verifyColumnHeaderFont(actualSheet);
-        verifyContentCellFont(actualSheet);
-    }
-
-    private void verifyFreezePane(XSSFSheet sheet) {
-        PaneInformation paneInformation = sheet.getPaneInformation();
-        assertThat(paneInformation).isNotNull();
-        assertThat(paneInformation.isFreezePane()).isTrue();
-        assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
-        assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
-    }
-
-    private void verifyColumnHeaderFont(XSSFSheet sheet) {
-        XSSFRow columnHeaderRow = sheet.getRow(0);
-        for (Cell cell : columnHeaderRow) {
-            XSSFRichTextString headerCellValue = (XSSFRichTextString) cell.getRichStringCellValue();
-            assertThat(headerCellValue.getFontAtIndex(0)).isNotNull();
-            assertThat(headerCellValue.getFontAtIndex(0).getBold()).isTrue();
-        }
-    }
-
-    private void verifyContentCellFont(XSSFSheet sheet) {
-        XSSFRichTextString contentCellValue = sheet.getRow(1).getCell(0).getRichStringCellValue();
-        assertThat(contentCellValue.getFontAtIndex(0)).isNull();
+        verifyColumnHeaders(actualSheet);
     }
 
     private void setupWithoutHeaders(@TempDir File targetFolder) throws IOException, InvalidFormatException {
@@ -121,5 +105,42 @@ class SkinnyWriterInterfaceHandlingTest extends AbstractSkinnyWriterTestBase {
         writer.addSheetToWorkbook(firstSheetContent);
         writeAndReadActualWorkbook(targetFolder);
     }
+
+    protected void verifyNoColumnHeaders(XSSFSheet sheet) {
+        PaneInformation paneInformation = sheet.getPaneInformation();
+        assertThat(paneInformation).isNull();
+
+        XSSFRichTextString topLeftCellValue = sheet.getRow(0).getCell(0).getRichStringCellValue();
+        assertThat(topLeftCellValue.getFontAtIndex(0)).isNull();
+    }
+
+    protected void verifyColumnHeaders(XSSFSheet sheet) {
+        verifyFreezePane(sheet);
+        verifyColumnHeaderFont(sheet);
+        verifyContentCellFont(sheet);
+    }
+
+    protected void verifyFreezePane(XSSFSheet sheet) {
+        PaneInformation paneInformation = sheet.getPaneInformation();
+        assertThat(paneInformation).isNotNull();
+        assertThat(paneInformation.isFreezePane()).isTrue();
+        assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
+        assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
+    }
+
+    protected void verifyColumnHeaderFont(XSSFSheet sheet) {
+        XSSFRow columnHeaderRow = sheet.getRow(0);
+        for (Cell cell : columnHeaderRow) {
+            XSSFRichTextString headerCellValue = (XSSFRichTextString) cell.getRichStringCellValue();
+            assertThat(headerCellValue.getFontAtIndex(0)).isNotNull();
+            assertThat(headerCellValue.getFontAtIndex(0).getBold()).isTrue();
+        }
+    }
+
+    protected void verifyContentCellFont(XSSFSheet sheet) {
+        XSSFRichTextString contentCellValue = sheet.getRow(1).getCell(0).getRichStringCellValue();
+        assertThat(contentCellValue.getFontAtIndex(0)).isNull();
+    }
+
 
 }

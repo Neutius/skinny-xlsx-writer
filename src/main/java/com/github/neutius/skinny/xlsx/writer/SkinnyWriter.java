@@ -60,6 +60,20 @@ public final class SkinnyWriter {
     }
 
     /**
+     * TODO write JavaDoc
+     * @param targetFolder
+     * @param fileName
+     * @param sheetContentList
+     * @throws IOException
+     */
+
+    public static void writeContentToFileSystem(File targetFolder, String fileName, List<SkinnySheetContent> sheetContentList) throws IOException {
+        SkinnyWriter writer = new SkinnyWriter(targetFolder, fileName);
+        writer.addSeveralSheetsToWorkbook(sheetContentList);
+        writer.writeToFile();
+    }
+
+    /**
      * Calling this constructor will initialize an in memory Workbook with no sheets. A sheet has to be added before any column
      * headers or content rows can be added, and before a valid .xlsx can be written to the file system.
      * <p>
@@ -213,12 +227,30 @@ public final class SkinnyWriter {
         createNewSheet(sheetName);
     }
 
+    /**
+     * TODO write JavaDoc
+     *
+     * @param sheetContent
+     */
+
     public void addSheetToWorkbook(SkinnySheetContent sheetContent) {
         addSheetToWorkbook(sheetContent.getSheetName());
         if (sheetContent.hasColumnHeaders()) {
             addColumnHeaderRowToCurrentSheet(sheetContent.getColumnHeaders());
         }
         addSeveralRowsToCurrentSheet(sheetContent.getContentRows());
+    }
+
+    /**
+     * TODO write Javadoc
+     *
+     * @param sheetList
+     */
+    public void addSeveralSheetsToWorkbook(List<SkinnySheetContent> sheetList) {
+        for (SkinnySheetContent sheetContent : sheetList) {
+            addSheetToWorkbook(sheetContent);
+        }
+
     }
 
     /**
