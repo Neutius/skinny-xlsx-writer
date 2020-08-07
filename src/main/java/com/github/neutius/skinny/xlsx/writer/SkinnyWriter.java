@@ -60,21 +60,38 @@ public final class SkinnyWriter {
     }
 
     /**
+     * Calling this constructor will initialize an in memory Workbook with no sheets. A sheet has to be added before any column
+     * headers or content rows can be added, and before a valid .xlsx can be written to the file system.
+     * <p>
+     * This constructor does not write anything to the file system.
+     *
+     * @param targetFolder The target directory where the .xlsx file will be written to. Must be an existing directory.
+     * @param fileName     The base name of the .xlsx that will be written.
+     *                     No extension needed, this constructor automatically adds the .xlsx extension, without checking if an
+     *                     extension is already present, e.g. passing in "myFile.xlsx" will result in a file named "myFile.xlsx.xlsx".
+     */
+
+    public SkinnyWriter(File targetFolder, String fileName) {
+        targetFile = new File(targetFolder, sanitizeFileName(fileName) + EXTENSION);
+        workbook = new XSSFWorkbook();
+    }
+
+    /**
      * Calling this constructor will initialize an in memory Workbook with a single empty Sheet, which will be
      * immediately written to disk. This ensures any IOException will be encountered as quickly as possible.
      * <p>
      * Warning: if the target directory already has a .xlsx file with the same base name,
      * it will be overwritten with no further warning.
      *
-     * @param targetFolder The target directory where the .xlsx file will be written to. Must be an existing directory.
-     * @param fileName The base name of the .xlsx that will be written.
-     *                 No extension needed, this constructor automatically adds the .xlsx extension, without checking if an
-     *                 extension is already present, e.g. passing in "myFile.xlsx" will result in a file named "myFile.xlsx.xlsx".
-     *                 If null or an empty String is passed in, the file will be given a name.
+     * @param targetFolder   The target directory where the .xlsx file will be written to. Must be an existing directory.
+     * @param fileName       The base name of the .xlsx that will be written.
+     *                       No extension needed, this constructor automatically adds the .xlsx extension, without checking if an
+     *                       extension is already present, e.g. passing in "myFile.xlsx" will result in a file named "myFile.xlsx.xlsx".
+     *                       If null or an empty String is passed in, the file will be given a name.
      * @param firstSheetName The name of the first sheet of the .xlsx file.
      *                       If null or an empty String is passed in, the sheet will be given a name.
      * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
-     * will remain uncaught.
+     *                     will remain uncaught.
      */
 
     public SkinnyWriter(File targetFolder, String fileName, String firstSheetName) throws IOException {
@@ -111,11 +128,11 @@ public final class SkinnyWriter {
      * This is a basic method, that is called by several other methods.
      *
      * @param columnHeaderRow The List of String values to be added to the column header row.
-     *
-     * @throws NullPointerException Passing in any null value will result in a NullPointerException, which will remain uncaught.
+     * @throws NullPointerException     Passing in any null value will result in a NullPointerException, which will remain uncaught.
+     *                                  Calling this method before any sheet has been added will result in the same Exception.
      * @throws IllegalArgumentException Will be thrown when any <code>String</code> value is blank, i.e., an empty String or
      *                                  a String consisting of nothing but white space characters.
-     * @throws IllegalStateException Will be thrown when the current sheet is not empty.
+     * @throws IllegalStateException    Will be thrown when the current sheet is not empty.
      */
 
     public void addColumnHeaderRowToCurrentSheet(List<String> columnHeaderRow) {
@@ -141,8 +158,11 @@ public final class SkinnyWriter {
      * Creates a new row at the bottom of the current sheet, and adds the parameter values (if any) as cell values to this row.
      * <p>
      * This is a basic method, that is called by several other methods.
+     *
      * @param rowContent The Strings in this List will be added to the new row in the same order.
      *                   If an empty List or null is passed in, the new row will remain empty.
+     * @throws NullPointerException Calling this method before any sheet has been added will result in a NullPointerException,
+     *                              which will remain uncaught.
      */
 
     public void addRowToCurrentSheet(List<String> rowContent) {
@@ -169,6 +189,7 @@ public final class SkinnyWriter {
      * <code>List&lt;String&gt;</code> in the main <code>List&lt;List&lt;String&gt;&gt;</code>.
      * <p>
      * This method is called by several higher level convenience methods.
+     *
      * @param rowContentList The content to be te added to the current sheet.
      */
 
@@ -197,9 +218,9 @@ public final class SkinnyWriter {
      * <p>
      * This is a convenience method that calls several basic method of this class.
      *
-     * @param sheetName The name of the sheet to be added to the .xlsx file.
-     *                  If null or an empty String is passed in, the sheet will be given a name.
-     *                  If a non-unique sheet name is passed in, the sheet will be given a unique name.
+     * @param sheetName    The name of the sheet to be added to the .xlsx file.
+     *                     If null or an empty String is passed in, the sheet will be given a name.
+     *                     If a non-unique sheet name is passed in, the sheet will be given a unique name.
      * @param sheetContent The content to be te added to the new sheet.
      *                     Null values are allowed and wil result in an empty sheet.
      */
@@ -216,9 +237,9 @@ public final class SkinnyWriter {
      * <p>
      * This is a convenience method that calls several basic methods of this class.
      *
-     * @param sheetName The name of the sheet to be added to the .xlsx file.
-     *                  If null or an empty String is passed in, the sheet will be given a name.
-     *                  If a non-unique sheet name is passed in, the sheet will be given a unique name.
+     * @param sheetName              The name of the sheet to be added to the .xlsx file.
+     *                               If null or an empty String is passed in, the sheet will be given a name.
+     *                               If a non-unique sheet name is passed in, the sheet will be given a unique name.
      * @param sheetHeadersAndContent The first List&lt;String&gt; entry will be added as a column header row to the new sheet.
      *                               Every entry after the first (if any) will be added as a content row.
      */
@@ -241,8 +262,8 @@ public final class SkinnyWriter {
      * If the order of the sheets is relevant, using a LinkedHashMap or similar Map implementation is highly recommended.
      *
      * @param sheetNameAndContentMap For each entry in this map, a sheet will be added to the .xlsx file.
-     * The key of each entry will be the name of the new sheet.
-     * The value of each entry (if any) will be the content of the corresponding sheet.
+     *                               The key of each entry will be the name of the new sheet.
+     *                               The value of each entry (if any) will be the content of the corresponding sheet.
      */
 
     public void addSeveralSheetsWithContentToWorkbook(Map<String, List<List<String>>> sheetNameAndContentMap) {
@@ -259,9 +280,9 @@ public final class SkinnyWriter {
      * If the order of the sheets is relevant, using a LinkedHashMap or similar Map implementation is highly recommended.
      *
      * @param sheetNameAndHeadersAndContentMap For each entry in this map, a sheet will be added to the .xlsx file.
-     * The key of each entry will be the name of the new sheet.
-     * The value of each entry will be the content of the corresponding sheet, with the first <code>List&lt;String&gt;</code> added
-     * as a column header row to the top of the sheet, and any subsequent <code>List&lt;String&gt;</code> (if any) as content rows.
+     *                                         The key of each entry will be the name of the new sheet.
+     *                                         The value of each entry will be the content of the corresponding sheet, with the first <code>List&lt;String&gt;</code> added
+     *                                         as a column header row to the top of the sheet, and any subsequent <code>List&lt;String&gt;</code> (if any) as content rows.
      */
 
     public void addSeveralSheetsWithHeadersAndContentToWorkbook(Map<String, List<List<String>>> sheetNameAndHeadersAndContentMap) {
@@ -272,8 +293,9 @@ public final class SkinnyWriter {
      * Writes a new .xlsx file on the file system with all added sheets and rows, writing over any previous version.
      * <p>
      * This is a basic method, that is called by the constructor when writing an empty .xlsx file with a single sheet.
+     *
      * @throws IOException Any Exception that occurs while creating a file on the file system or writing to this file
-     * will remain uncaught.
+     *                     will remain uncaught.
      */
 
     public void writeToFile() throws IOException {
@@ -286,6 +308,7 @@ public final class SkinnyWriter {
 
     /**
      * Returns a String representation, including information considered useful for debugging or logging.
+     *
      * @return A String representation, containing the target .xlsx file, the current amount of sheets, and the amount of rows and
      * columns on the current sheet.
      */
@@ -293,7 +316,7 @@ public final class SkinnyWriter {
     @Override
     public String toString() {
         return String.format("SkinnyWriter - target .xlsx file: %s - current amount of sheets: %s - current sheet has %s rows and "
-                + "%s columns", targetFile.toString(), workbook.getNumberOfSheets(),
+                        + "%s columns", targetFile.toString(), workbook.getNumberOfSheets(),
                 currentSheet.getPhysicalNumberOfRows(), currentColumnAmount);
     }
 
@@ -324,6 +347,10 @@ public final class SkinnyWriter {
     }
 
     private void adjustColumnSizesInCurrentSheet() {
+        if (currentSheet == null) {
+            return;
+        }
+
         currentCellStyle.setWrapText(false);
 
         for (int index = 0; index < currentColumnAmount; index++) {
