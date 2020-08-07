@@ -3,9 +3,8 @@ package com.github.neutius.skinny.xlsx.writer;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,23 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
 
-    protected File targetFolder;
-    
-    @BeforeEach
-    void setUpTargetFolder() {
-        targetFolder = new File("D:\\dev\\test\\excel");
-        File[] fileArray = targetFolder.listFiles();
-
-        if (fileArray != null && fileArray.length > 0) {
-            for (File file : fileArray) {
-                assertThat(file.delete()).isTrue();
-            }
-        }
-    }
-
-    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
-    void verifySetUp_targetFolderIsUsable() {
+    void verifySetUp_targetFolderIsUsable(@TempDir File targetFolder) {
         assertThat(targetFolder).exists();
         assertThat(targetFolder).isDirectory();
         assertThat(targetFolder).isEmptyDirectory();
@@ -38,18 +22,16 @@ class SkinnyWriterBasicFileWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(targetFolder).canWrite();
     }
 
-    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
-    void createNewFile_fileExists() throws IOException {
+    void createNewFile_fileExists(@TempDir File targetFolder) throws IOException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
         File expectedFile = new File(targetFolder, FILE_NAME + EXTENSION);
         assertThat(expectedFile).exists();
     }
 
-    @EnabledIfSystemProperty(matches = "true", named = "test.local")
     @Test
-    void createNewFile_emptyFileIsValidXlsxFile() throws IOException, InvalidFormatException {
+    void createNewFile_emptyFileIsValidXlsxFile(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
         File targetFile = new File(targetFolder, FILE_NAME + EXTENSION);
