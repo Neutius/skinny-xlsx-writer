@@ -213,6 +213,14 @@ public final class SkinnyWriter {
         createNewSheet(sheetName);
     }
 
+    public void addSheetToWorkbook(SkinnySheetContent sheetContent) {
+        addSheetToWorkbook(sheetContent.getSheetName());
+        if (sheetContent.hasColumnHeaders()) {
+            addColumnHeaderRowToCurrentSheet(sheetContent.getColumnHeaders());
+        }
+        addSeveralRowsToCurrentSheet(sheetContent.getContentRows());
+    }
+
     /**
      * Adds a single sheet with no column header row and zero or more content rows.
      * <p>

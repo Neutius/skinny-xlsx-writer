@@ -115,7 +115,7 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     void addSheetWithNullAsName_nameIsGenerated(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.addSheetToWorkbook(null);
+        writer.addSheetToWorkbook((String) null);
 
         writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(2);

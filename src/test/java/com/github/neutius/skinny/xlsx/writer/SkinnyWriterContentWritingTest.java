@@ -161,8 +161,4 @@ class SkinnyWriterContentWritingTest extends AbstractSkinnyWriterTestBase {
         assertThat(actualCell.getColumnIndex()).isEqualTo(0);
         assertThat(actualCell.getRowIndex()).isEqualTo(0);
     }
-
-    void verifyCellContent(XSSFSheet actualSheet, int rowIndex, int columnIndex, String expectedCellContent) {
-        assertThat(actualSheet.getRow(rowIndex).getCell(columnIndex).getStringCellValue()).isEqualTo(expectedCellContent);
-    }
 }
