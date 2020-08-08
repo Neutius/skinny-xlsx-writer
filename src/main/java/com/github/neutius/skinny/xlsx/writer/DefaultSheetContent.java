@@ -11,6 +11,11 @@ import java.util.List;
 
 public final class DefaultSheetContent implements SkinnySheetContent {
 
+    private static final String EXCEPTION_NULL_LIST = "List of column headers should not be null";
+    private static final String EXCEPTION_EMPTY_LIST = "List of column headers should not be empty";
+    private static final String EXCEPTION_LIST_CONTAINS_INVALID_VALUE
+            = "List of column headers should only contain String values with at least 1 non-whitespace character";
+
     private final String sheetName;
     private final boolean hasColumnHeaders;
     private final List<String> columnHeaders;
@@ -22,10 +27,14 @@ public final class DefaultSheetContent implements SkinnySheetContent {
      *
      * @param sheetName     The name of the sheet to be added.
      * @param columnHeaders Represents the column header row: A List of String values to be added to the sheet as column headers.
+     *                      Cannot be null or empty, and can only contain String values with at least 1 non-whitespace character.
      * @param contentRows   Represents the content rows: zero or more Lists
      *                      containing zero or more String values to be added as content cell values.
      * @return A representation of a sheet to be added to a .xlsx file by the SkinnyWriter class.
      * Implements the SkinnySheetContent interface, allowing this return value to be passed directly to the SkinnyWriter class.
+     *
+     * @throws IllegalArgumentException An Exception will be thrown if the <code>List&lt;String&gt; columnHeaders</code>
+     * is null, is empty, contains any null value, or contains any blank String.
      */
 
     public static DefaultSheetContent withHeaders(String sheetName, List<String> columnHeaders, List<List<String>> contentRows) {
@@ -47,11 +56,36 @@ public final class DefaultSheetContent implements SkinnySheetContent {
         return new DefaultSheetContent(sheetName, false, null, contentRows);
     }
 
-    private DefaultSheetContent(String sheetName, boolean hasColumnHeaders, List<String> columnHeaders, List<List<String>> contentRows) {
+    private DefaultSheetContent(String sheetName, boolean hasColumnHeaders, List<String> columnHeaders,
+                                List<List<String>> contentRows) {
         this.sheetName = sheetName;
         this.hasColumnHeaders = hasColumnHeaders;
-        this.columnHeaders = hasColumnHeaders ? columnHeaders : null;
+        this.columnHeaders = sanitizeColumnHeaders(hasColumnHeaders, columnHeaders);
         this.contentRows = contentRows;
+    }
+
+    private List<String> sanitizeColumnHeaders(boolean hasColumnHeaders, List<String> columnHeaders) {
+        if (!hasColumnHeaders) {
+            return null;
+        }
+        throwExceptionIfParameterIsInvalid(columnHeaders);
+        return columnHeaders;
+    }
+
+    private void throwExceptionIfParameterIsInvalid(List<String> columnHeaders) {
+        if (columnHeaders == null) {
+            throw new IllegalArgumentException(EXCEPTION_NULL_LIST);
+        }
+        if (columnHeaders.isEmpty()) {
+            throw new IllegalArgumentException(EXCEPTION_EMPTY_LIST);
+        }
+        if (listContainsNullOrBlankString(columnHeaders)) {
+            throw new IllegalArgumentException(EXCEPTION_LIST_CONTAINS_INVALID_VALUE);
+        }
+    }
+
+    private boolean listContainsNullOrBlankString(List<String> stringList) {
+        return stringList.stream().anyMatch(value -> value == null || value.isBlank());
     }
 
     @Override

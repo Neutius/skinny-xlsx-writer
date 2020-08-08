@@ -1,10 +1,14 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DefaultSheetContentTest {
 
@@ -30,5 +34,47 @@ class DefaultSheetContentTest {
         assertThat(sheetContent.hasColumnHeaders()).isFalse();
         assertThat(sheetContent.getColumnHeaders()).isNull();
         assertThat(sheetContent.getContentRows()).isEqualTo(contentRows);
+    }
+
+    @Test
+    void withHeaders_columnHeadersIsNull_throwsIllegalArgumentException() {
+        List<String> invalidColumnHeaders = null;
+
+        verifyThrownException(invalidColumnHeaders);
+    }
+
+    @Test
+    void withHeaders_columnHeadersIsEmptyList_throwsIllegalArgumentException() {
+        List<String> invalidColumnHeaders = Collections.emptyList();
+
+        verifyThrownException(invalidColumnHeaders);
+    }
+
+    @Test
+    void withHeaders_columnHeadersContainsNull_throwsIllegalArgumentException() {
+        List<String> invalidColumnHeaders = Arrays.asList("valid", "header", null);
+
+        verifyThrownException(invalidColumnHeaders);
+    }
+
+    @Test
+    void withHeaders_columnHeadersContainsEmptyString_throwsIllegalArgumentException() {
+        List<String> invalidColumnHeaders = Arrays.asList("valid", "header", "");
+
+        verifyThrownException(invalidColumnHeaders);
+    }
+
+    @Test
+    void withHeaders_columnHeadersContainsBlankString_throwsIllegalArgumentException() {
+        List<String> invalidColumnHeaders = Arrays.asList("valid", "header", "       ");
+
+        verifyThrownException(invalidColumnHeaders);
+    }
+
+    private void verifyThrownException(List<String> invalidColumnHeaders) {
+        assertThatThrownBy(() -> DefaultSheetContent.withHeaders(sheetName, invalidColumnHeaders, contentRows))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("column")
+                .hasMessageContaining("header");
     }
 }
