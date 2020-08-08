@@ -127,12 +127,12 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
     void addSheetWithTooLongName_nameIsSnipped(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
-        writer.addSheetToWorkbook("abcdefghijklmnopqrstuvwxyz1234567890");
+        writer.addSheetToWorkbook("12345678901234567890123456789012345678901234567890");
 
         writeAndReadActualWorkbook(targetFolder);
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(2);
         assertThat(actualWorkbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
-        assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("abcdefghijklmnopqrstuvwxyz12345");
+        assertThat(actualWorkbook.getSheetAt(1).getSheetName()).isEqualTo("1234567890123456789012345678901");
     }
 
 }
