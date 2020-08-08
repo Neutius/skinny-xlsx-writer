@@ -4,10 +4,10 @@ import java.util.List;
 
 public final class DefaultSheetContent implements SkinnySheetContent {
 
-    private String sheetName;
-    private boolean hasColumnHeaders;
-    private List<String> columnHeaders;
-    private List<List<String>> contentRows;
+    private final String sheetName;
+    private final boolean hasColumnHeaders;
+    private final List<String> columnHeaders;
+    private final List<List<String>> contentRows;
 
     public static DefaultSheetContent withHeaders(String sheetName, List<String> columnHeaders, List<List<String>> contentRows) {
         return new DefaultSheetContent(sheetName, true, columnHeaders, contentRows);
