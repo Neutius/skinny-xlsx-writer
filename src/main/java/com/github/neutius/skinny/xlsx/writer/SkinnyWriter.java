@@ -135,11 +135,10 @@ public final class SkinnyWriter {
     /**
      * Creates a row at the top of the current sheet, and adds the parameter values as cell values to this row.
      * <p>
-     * This row is unique in three ways:
+     * This row is unique in two ways:
      * <ol>
      * <li>Column header text will be given a bold font.</li>
      * <li>A freeze pane will be applied to the column header row.</li>
-     * <li>Line wrapping is disabled for column header cells.</li>
      * </ol>
      * <p>
      * Adding column headers to a sheet is optional.
@@ -423,13 +422,9 @@ public final class SkinnyWriter {
             return;
         }
 
-        currentCellStyle.setWrapText(false);
-
         for (int index = 0; index < currentColumnAmount; index++) {
             currentSheet.autoSizeColumn(index);
         }
-
-        currentCellStyle.setWrapText(true);
     }
 
     private XSSFRichTextString applyColumnHeaderFont(String originalValue) {

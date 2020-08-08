@@ -186,7 +186,7 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
     private void assertColumnHeaderRowAndContentRow(XSSFSheet actualSheet) {
         XSSFCell contentCell = actualSheet.getRow(1).getCell(0);
         assertThat(contentCell.getRichStringCellValue().getFontAtIndex(0)).isNull();
-        assertThat(contentCell.getCellStyle().getWrapText()).isTrue();
+        assertThat(contentCell.getCellStyle().getWrapText()).isFalse();
 
         XSSFCell headerCell = actualSheet.getRow(0).getCell(0);
         assertThat(headerCell.getRichStringCellValue().getFontAtIndex(0).getBold()).isTrue();

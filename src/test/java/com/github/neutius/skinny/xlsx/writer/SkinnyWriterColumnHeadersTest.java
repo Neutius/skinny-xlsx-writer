@@ -76,7 +76,8 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
     }
 
     @Test
-    void columnHeaderRowIsAdded_wrapTextOnlyOnContentCells(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+    void columnHeaderRowIsAdded_wrapTextIsFalseForColumnHeadersAndContentCells(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
         writer = new SkinnyWriter(targetFolder, FILE_NAME, SHEET_NAME);
 
         writer.addColumnHeaderRowToCurrentSheet(List.of("column header", "column header"));
@@ -85,7 +86,7 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
         writeAndReadActualWorkbook(targetFolder);
         XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
         assertThat(actualSheet.getRow(0).getCell(0).getCellStyle().getWrapText()).isFalse();
-        assertThat(actualSheet.getRow(1).getCell(0).getCellStyle().getWrapText()).isTrue();
+        assertThat(actualSheet.getRow(1).getCell(0).getCellStyle().getWrapText()).isFalse();
     }
 
     @Test
