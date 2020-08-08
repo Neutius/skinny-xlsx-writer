@@ -1,17 +1,21 @@
 # Software Component: Skinny .xlsx Writer
 
 ## Description
-The Skinny .xlsx Writer allows you to create a new .xlsx file with a single sheet, add a column header row to the top of this sheet, 
-and write rows of data to the sheet. You can add more sheets to the .xlsx and add more rows to the current sheet.
+The Skinny .xlsx Writer allows you to write in memory data to a .xlsx file with as little effort as possible. Options are limited 
+to instantiating a single in memory workbook, adding sheets to the workbook, adding column headers and/or content rows to a sheet, 
+and writing a .xlsx file to disk.
+
+Several constructors, basic methods and convenience methods are provided.
+Optionally, an interface representing a single sheet can be used, for which a default implementation is provided.  
 
 The Skinny .xlsx Writer can only move forward, and has no ability to manipulate sheets other than the newest one. The fanciest 
 option is a top row with bold font and freeze pane applied.
 
-When first called, the Skinny .xlsx Writer immediately writes an empty version of the .xlsx file to the target File location 
+One constructor of the SkinnyWriter class immediately writes an empty version of the .xlsx file to the target File location 
 provided, ensuring any problems writing to disk become apparent as quickly as possible.
 
-This module is meant to be as light-weight as possible. It contains a single class with hardly any methods, and uses a minimum of 
-dependencies. It's basically a thin wrapper with some convenience methods and an excessive unit test suite.
+This module is meant to be as light-weight as possible. It's basically a thin wrapper with some convenience methods, 
+a minimum of dependencies and an excessive unit test suite.
 
 The original use case is domain-driven data processing and data analysis, where a medium sized xml-file (max 400MB) is processed.
 Parts of the original data, along with derived data and data analysis, is written to an .xlsx file for further analysis or processing.
@@ -22,7 +26,7 @@ This module is designed with two main goals:
 	- There are many powerful libraries for working with .xlsx files, which offer great functionality.
 	- For simpler use cases, most of these libraries are simply too bloated.
 - Work without a template file.
-	- A template file forces you to maintain the code and the template in tandem is error prone, bad practice, and simply annoying.
+	- A template file forces you to maintain the code and the template in tandem, which is error prone and simply annoying.
 	- A spreadsheet is just a data container that is slightly more human readable than a database or an xml file.
 
 ## API Design
@@ -53,7 +57,8 @@ This module is designed with two main goals:
     - The in memory Workbook representation has nothing to close.
     - Any OutputStream will be closed immediately after writing to disk.
 
-## Alternate API design - Work in Progress
-1. As above, but to everything with one method call.
-    - Only functional difference: column header rows have be added to all sheets, or not at all.
+## Alternate API design - One-Stop Shop
+1. As above, but does everything with one method call to a static method.
+    - An interface is declared to represent a single sheet - with name, content, and (optionally) column headers.
+        - A default implementation of this interface is provided.
 
