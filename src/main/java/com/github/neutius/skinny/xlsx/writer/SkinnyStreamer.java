@@ -55,13 +55,10 @@ public final class SkinnyStreamer {
     }
 
     private SkinnyStreamer(File targetFolder, String fileName, boolean autoSizeColumn) {
-        this.autoSizeColumn = autoSizeColumn;
         targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new SXSSFWorkbook();
-        Font columnHeaderFont = workbook.createFont();
-        columnHeaderFont.setBold(true);
-        columnHeaderCellStyle = workbook.createCellStyle();
-        columnHeaderCellStyle.setFont(columnHeaderFont);
+        columnHeaderCellStyle = SkinnyUtil.createColumnHeaderCellStyle(workbook);
+        this.autoSizeColumn = autoSizeColumn;
     }
 
     private void writeToFile() throws IOException {

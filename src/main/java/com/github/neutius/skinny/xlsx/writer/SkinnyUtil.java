@@ -1,5 +1,7 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -41,5 +43,14 @@ class SkinnyUtil {
         for (int index = 0; index < currentColumnAmount; index++) {
             currentSheet.autoSizeColumn(index);
         }
+    }
+
+    static CellStyle createColumnHeaderCellStyle(Workbook workbook) {
+        Font columnHeaderFont = workbook.createFont();
+        columnHeaderFont.setBold(true);
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(columnHeaderFont);
+        style.setWrapText(false);
+        return style;
     }
 }

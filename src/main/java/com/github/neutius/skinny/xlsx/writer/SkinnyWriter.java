@@ -1,7 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -102,7 +101,7 @@ public final class SkinnyWriter {
     public SkinnyWriter(File targetFolder, String fileName) {
         targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new XSSFWorkbook();
-        columnHeaderCellStyle = createColumnHeaderCellStyle();
+        columnHeaderCellStyle = SkinnyUtil.createColumnHeaderCellStyle(workbook);
     }
 
     /**
@@ -127,7 +126,7 @@ public final class SkinnyWriter {
     public SkinnyWriter(File targetFolder, String fileName, String firstSheetName) throws IOException {
         targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new XSSFWorkbook();
-        columnHeaderCellStyle = createColumnHeaderCellStyle();
+        columnHeaderCellStyle = SkinnyUtil.createColumnHeaderCellStyle(this.workbook);
         createNewSheet(firstSheetName);
         writeToFile();
     }
@@ -390,14 +389,6 @@ public final class SkinnyWriter {
         return String.format("SkinnyWriter - target .xlsx file: %s - current amount of sheets: %s - current sheet has %s rows and "
                         + "%s columns", targetFile.toString(), workbook.getNumberOfSheets(),
                 currentSheet.getPhysicalNumberOfRows(), currentColumnAmount);
-    }
-
-    private CellStyle createColumnHeaderCellStyle() {
-        CellStyle style = workbook.createCellStyle();
-        Font columnHeaderFont = workbook.createFont();
-        columnHeaderFont.setBold(true);
-        style.setFont(columnHeaderFont);
-        return style;
     }
 
     private void createNewSheet(String sheetName) {
