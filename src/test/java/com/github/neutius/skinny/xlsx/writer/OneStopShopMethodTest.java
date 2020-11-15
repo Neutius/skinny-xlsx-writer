@@ -33,11 +33,26 @@ class OneStopShopMethodTest extends SkinnyWriterInterfaceHandlingTest {
     }
 
     @Test
-    void useStaticFactoryMethod_allSheetsComeOutProperly(@TempDir File targetFolder)
+    void useSkinnyWriterStaticFactoryMethod_allSheetsComeOutProperly(@TempDir File targetFolder)
             throws IOException, InvalidFormatException {
         List<SkinnySheetContent> sheetContentList = getSheetContentList();
 
         SkinnyWriter.writeContentToFileSystem(targetFolder, FILE_NAME, sheetContentList);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        assertThat(actualWorkbook).hasSize(4);
+        verifyFirstSheet();
+        verifySecondSheet();
+        verifyThirdSheet();
+        verifyFourthSheet();
+    }
+
+    @Test
+    void useSkinnyStreamerStaticFactoryMethod_allSheetsComeOutProperly(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        List<SkinnySheetContent> sheetContentList = getSheetContentList();
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, sheetContentList, true);
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).hasSize(4);

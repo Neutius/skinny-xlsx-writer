@@ -61,4 +61,5 @@ This module is designed with two main goals:
 1. As above, but does everything with one method call to a static method.
     - An interface is declared to represent a single sheet - with name, content, and (optionally) column headers.
         - A default implementation of this interface is provided.
-
+2. Currently in beta development: a similar static method that the Apache POI SXSSF streaming API to improve performance.
+    - This version offers the option to disable automatically adjusting column width to improve performance.

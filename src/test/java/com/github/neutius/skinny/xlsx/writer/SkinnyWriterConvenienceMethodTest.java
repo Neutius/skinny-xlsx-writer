@@ -2,7 +2,7 @@ package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.util.PaneInformation;
-import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -184,13 +184,15 @@ class SkinnyWriterConvenienceMethodTest extends AbstractSkinnyWriterTestBase {
     }
 
     private void assertColumnHeaderRowAndContentRow(XSSFSheet actualSheet) {
-        XSSFCell contentCell = actualSheet.getRow(1).getCell(0);
-        assertThat(contentCell.getRichStringCellValue().getFontAtIndex(0)).isNull();
-        assertThat(contentCell.getCellStyle().getWrapText()).isFalse();
+        XSSFCellStyle contentCellStyle = actualSheet.getRow(1).getCell(0).getCellStyle();
+        assertThat(contentCellStyle.getWrapText()).isFalse();
+        assertThat(contentCellStyle.getFont()).isNotNull();
+        assertThat(contentCellStyle.getFont().getBold()).isFalse();
 
-        XSSFCell headerCell = actualSheet.getRow(0).getCell(0);
-        assertThat(headerCell.getRichStringCellValue().getFontAtIndex(0).getBold()).isTrue();
-        assertThat(headerCell.getCellStyle().getWrapText()).isFalse();
+        XSSFCellStyle headerCellStyle = actualSheet.getRow(0).getCell(0).getCellStyle();
+        assertThat(headerCellStyle.getWrapText()).isFalse();
+        assertThat(headerCellStyle.getFont()).isNotNull();
+        assertThat(headerCellStyle.getFont().getBold()).isTrue();
 
         PaneInformation paneInformation = actualSheet.getPaneInformation();
         assertThat(paneInformation).isNotNull();

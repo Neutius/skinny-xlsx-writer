@@ -2,6 +2,8 @@ package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.util.PaneInformation;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Test;
@@ -56,10 +58,10 @@ class SkinnyWriterColumnHeadersTest extends AbstractSkinnyWriterTestBase {
         writer.addRowToCurrentSheet(List.of("normal cell content", "normal cell content"));
 
         writeAndReadActualWorkbook(targetFolder);
-        XSSFSheet actualSheet = actualWorkbook.getSheetAt(0);
-        XSSFRichTextString headerCellValue = actualSheet.getRow(0).getCell(0).getRichStringCellValue();
-        assertThat(headerCellValue.getFontAtIndex(2)).isNotNull();
-        assertThat(headerCellValue.getFontAtIndex(2).getBold()).isTrue();
+        XSSFCell cell = actualWorkbook.getSheetAt(0).getRow(0).getCell(0);
+        XSSFFont font = cell.getCellStyle().getFont();
+        assertThat(font).isNotNull();
+        assertThat(font.getBold()).isTrue();
     }
 
     @Test

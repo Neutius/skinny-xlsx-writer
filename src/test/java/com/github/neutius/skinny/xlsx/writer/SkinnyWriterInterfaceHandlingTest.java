@@ -1,8 +1,9 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.PaneInformation;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -130,17 +131,18 @@ class SkinnyWriterInterfaceHandlingTest extends AbstractSkinnyWriterTestBase {
 
     protected void verifyColumnHeaderFont(XSSFSheet sheet) {
         XSSFRow columnHeaderRow = sheet.getRow(0);
-        for (Cell cell : columnHeaderRow) {
-            XSSFRichTextString headerCellValue = (XSSFRichTextString) cell.getRichStringCellValue();
-            assertThat(headerCellValue.getFontAtIndex(0)).isNotNull();
-            assertThat(headerCellValue.getFontAtIndex(0).getBold()).isTrue();
+        for (int index = 0; index < columnHeaderRow.getPhysicalNumberOfCells(); index++) {
+            XSSFFont font = columnHeaderRow.getCell(index).getCellStyle().getFont();
+            assertThat(font).isNotNull();
+            assertThat(font.getBold()).isTrue();
         }
     }
 
     protected void verifyContentCellFont(XSSFSheet sheet) {
-        XSSFRichTextString contentCellValue = sheet.getRow(1).getCell(0).getRichStringCellValue();
-        assertThat(contentCellValue.getFontAtIndex(0)).isNull();
+        XSSFCell cell = sheet.getRow(1).getCell(0);
+        XSSFFont font = cell.getCellStyle().getFont();
+        assertThat(font).isNotNull();
+        assertThat(font.getBold()).isFalse();
     }
-
 
 }

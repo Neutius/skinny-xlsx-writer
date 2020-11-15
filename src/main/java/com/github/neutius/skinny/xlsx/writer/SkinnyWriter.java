@@ -1,9 +1,10 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,8 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +43,9 @@ import java.util.Map;
 
 public final class SkinnyWriter {
 
-    private static final String EXTENSION = ".xlsx";
-
     private final File targetFile;
+    private final CellStyle columnHeaderCellStyle;
+
 
     private XSSFWorkbook workbook;
     private XSSFCellStyle currentCellStyle;
@@ -77,7 +76,7 @@ public final class SkinnyWriter {
      *                         If null or an empty String is passed in, the file will be given a name.
      * @param sheetContentList A List of objects implementing the SkinnySheetContent interface.
      *                         Each object in the List represents a sheet to be added to the .xlsx file.
-     * @throws IOException Any Exception occuring while writing to the file system will remain uncaught.
+     * @throws IOException Any Exception occurring while writing to the file system will remain uncaught.
      */
 
     public static void writeContentToFileSystem(File targetFolder, String fileName, List<SkinnySheetContent> sheetContentList)
@@ -101,8 +100,9 @@ public final class SkinnyWriter {
      */
 
     public SkinnyWriter(File targetFolder, String fileName) {
-        targetFile = new File(targetFolder, sanitizeFileName(fileName) + EXTENSION);
+        targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new XSSFWorkbook();
+        columnHeaderCellStyle = createColumnHeaderCellStyle();
     }
 
     /**
@@ -125,8 +125,9 @@ public final class SkinnyWriter {
      */
 
     public SkinnyWriter(File targetFolder, String fileName, String firstSheetName) throws IOException {
-        targetFile = new File(targetFolder, sanitizeFileName(fileName) + EXTENSION);
+        targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new XSSFWorkbook();
+        columnHeaderCellStyle = createColumnHeaderCellStyle();
         createNewSheet(firstSheetName);
         writeToFile();
     }
@@ -176,8 +177,8 @@ public final class SkinnyWriter {
 
         for (int columnIndex = 0; columnIndex < columnHeaderRow.size(); columnIndex++) {
             XSSFCell currentCell = headerColumnRow.createCell(columnIndex);
-
-            currentCell.setCellValue(applyColumnHeaderFont(columnHeaderRow.get(columnIndex)));
+            currentCell.setCellValue(columnHeaderRow.get(columnIndex));
+            currentCell.setCellStyle(columnHeaderCellStyle);
         }
 
         currentSheet.createFreezePane(0, 1);
@@ -240,7 +241,7 @@ public final class SkinnyWriter {
      */
 
     public void addSheetToWorkbook(String sheetName) {
-        adjustColumnSizesInCurrentSheet();
+        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
         createNewSheet(sheetName);
     }
 
@@ -370,7 +371,7 @@ public final class SkinnyWriter {
      */
 
     public void writeToFile() throws IOException {
-        adjustColumnSizesInCurrentSheet();
+        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
         targetFile.createNewFile();
         FileOutputStream outputStream = new FileOutputStream(targetFile);
         workbook.write(outputStream);
@@ -391,45 +392,20 @@ public final class SkinnyWriter {
                 currentSheet.getPhysicalNumberOfRows(), currentColumnAmount);
     }
 
+    private CellStyle createColumnHeaderCellStyle() {
+        CellStyle style = workbook.createCellStyle();
+        Font columnHeaderFont = workbook.createFont();
+        columnHeaderFont.setBold(true);
+        style.setFont(columnHeaderFont);
+        return style;
+    }
+
     private void createNewSheet(String sheetName) {
-        currentSheet = workbook.createSheet(sanitizeSheetName(sheetName));
+        currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(sheetName, workbook));
         currentCellStyle = workbook.createCellStyle();
         currentCellStyle.setWrapText(false);
         currentColumnAmount = 0;
         rowIndex = 0;
     }
 
-    private String sanitizeFileName(String fileName) {
-        if (fileName == null || fileName.isBlank()) {
-            return "output-at-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-        }
-        return fileName;
-    }
-
-    private String sanitizeSheetName(String sheetName) {
-        if (sheetName == null || sheetName.isBlank()) {
-            return "Sheet_" + (workbook.getNumberOfSheets() + 1);
-        }
-        if (workbook.getSheet(sheetName) != null) {
-            return sheetName + '_' + (workbook.getNumberOfSheets() + 1);
-        }
-
-        return sheetName;
-    }
-
-    private void adjustColumnSizesInCurrentSheet() {
-        if (currentSheet == null) {
-            return;
-        }
-
-        for (int index = 0; index < currentColumnAmount; index++) {
-            currentSheet.autoSizeColumn(index);
-        }
-    }
-
-    private XSSFRichTextString applyColumnHeaderFont(String originalValue) {
-        XSSFRichTextString richValue = new XSSFRichTextString(originalValue);
-        richValue.applyFont(columnHeaderFont);
-        return richValue;
-    }
 }
