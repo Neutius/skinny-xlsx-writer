@@ -12,11 +12,12 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SkinnyStreamerBasicTest extends AbstractSkinnyWriterTestBase {
+class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
 
     @Test
     void writeContentToFileSystem_fileExists(@TempDir File targetFolder) throws IOException {
@@ -70,7 +71,7 @@ class SkinnyStreamerBasicTest extends AbstractSkinnyWriterTestBase {
     }
 
     @Test
-    void writeContentToFileSystem_firstSheetHasColumnHeaders(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+    void writeContentToFileSystem_contentCellsAreNotBold(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         SkinnySheetContent firstSheet = DefaultSheetContent.withHeaders(SHEET_NAME, List.of("Header 1", "Header 2"),
                 List.of(List.of("Content 1", "Content 2")));
 
@@ -82,7 +83,12 @@ class SkinnyStreamerBasicTest extends AbstractSkinnyWriterTestBase {
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(2);
 
-        verifyNoHeaderFormatting(actualSheet.getRow(1));
+        XSSFRow row = actualSheet.getRow(1);
+        for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
+            XSSFFont font = row.getCell(index).getCellStyle().getFont();
+            assertThat(font).isNotNull();
+            assertThat(font.getBold()).isFalse();
+        }
     }
 
     @Test
@@ -99,11 +105,16 @@ class SkinnyStreamerBasicTest extends AbstractSkinnyWriterTestBase {
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(2);
 
-        verifyHeaderFormatting(actualSheet.getRow(0));
+        XSSFRow row = actualSheet.getRow(0);
+        for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
+            XSSFFont font = row.getCell(index).getCellStyle().getFont();
+            assertThat(font).isNotNull();
+            assertThat(font.getBold()).isTrue();
+        }
     }
 
     @Test
-    void writeContentToFileSystem_firstSheetHasFreezePan(@TempDir File targetFolder) throws IOException, InvalidFormatException {
+    void writeContentToFileSystem_firstSheetHasFreezePane(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         SkinnySheetContent firstSheet = DefaultSheetContent.withHeaders(SHEET_NAME, List.of("Header 1", "Header 2"),
                 List.of(List.of("Content 1", "Content 2")));
 
@@ -115,30 +126,86 @@ class SkinnyStreamerBasicTest extends AbstractSkinnyWriterTestBase {
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(2);
 
-        verifyFreezePane(actualSheet.getPaneInformation());
-    }
-
-    private void verifyFreezePane(PaneInformation paneInformation) {
+        PaneInformation paneInformation = actualSheet.getPaneInformation();
         assertThat(paneInformation).isNotNull();
         assertThat(paneInformation.isFreezePane()).isTrue();
         assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
         assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
     }
 
-    private void verifyHeaderFormatting(XSSFRow row) {
-        for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
-            XSSFFont font = row.getCell(index).getCellStyle().getFont();
-            assertThat(font).isNotNull();
-            assertThat(font.getBold()).isTrue();
-        }
+    @Test
+    void writeContentToFileSystem_withAutoSizeColumn_withoutHeaders_columnsHaveDifferentSize(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME,
+                List.of(List.of("Short", "Medium-sized text", "Longer text to be added to content cell")));
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
+        assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
     }
 
-    private void verifyNoHeaderFormatting(XSSFRow row) {
-        for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
-            XSSFFont font = row.getCell(index).getCellStyle().getFont();
-            assertThat(font).isNotNull();
-            assertThat(font.getBold()).isFalse();
-        }
+    @Test
+    void writeContentToFileSystem_noAutoSizeColumn_withoutHeaders_columnsHaveSameSize(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME,
+                List.of(List.of("Short", "Medium-sized text", "Longer text to be added to content cell")));
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), false);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet.getColumnWidth(0)).isEqualTo(actualSheet.getColumnWidth(1));
+        assertThat(actualSheet.getColumnWidth(1)).isEqualTo(actualSheet.getColumnWidth(2));
+    }
+
+    @Test
+    void writeContentToFileSystem_withAutoSizeColumn_withHeaders_columnsHaveDifferentSize(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        SkinnySheetContent sheet = DefaultSheetContent.withHeaders(SHEET_NAME,
+                List.of("Short", "Medium-sized text", "Longer text to be added to content cell"),
+                List.of(List.of("")));
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
+        assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
+    }
+
+    @Test
+    void writeContentToFileSystem_noAutoSizeColumn_withHeaders_columnsHaveSameSize(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        SkinnySheetContent sheet = DefaultSheetContent.withHeaders(SHEET_NAME,
+                List.of("Short", "Medium-sized text", "Longer text to be added to content cell"),
+                List.of(List.of("")));
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), false);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+        assertThat(actualSheet.getColumnWidth(0)).isEqualTo(actualSheet.getColumnWidth(1));
+        assertThat(actualSheet.getColumnWidth(1)).isEqualTo(actualSheet.getColumnWidth(2));
+    }
+
+    @Test
+    void writeContentToFileSystem_nullValuePassedIn_emptyRowIsAdded(@TempDir File targetFolder)
+            throws IOException, InvalidFormatException {
+        List<List<String>> contentRows = new ArrayList<>();
+        contentRows.add(List.of("Cell Content", "More Content"));
+        contentRows.add(null);
+        contentRows.add(List.of("Row 3 Cell 1", "Row 3 Cell 2"));
+        SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME, contentRows);
+
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+
+        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
+        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
+
+        assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(3);
     }
 
     private void verifySheetWithOneContentCell(XSSFSheet actualSheet) {

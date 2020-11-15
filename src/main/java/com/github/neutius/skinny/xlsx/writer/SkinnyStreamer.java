@@ -121,6 +121,7 @@ public final class SkinnyStreamer {
 
     private void addContentRow(SXSSFSheet currentSheet, List<String> contentRow) {
         if (contentRow == null) {
+            currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
             return;
         }
         SXSSFRow row = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
