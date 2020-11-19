@@ -23,7 +23,6 @@ public final class SkinnyStreamer {
     private final File targetFile;
     private final SXSSFWorkbook workbook;
     private final CellStyle columnHeaderCellStyle;
-    private final boolean autoSizeColumn = true;
 
     private int currentColumnAmount = 1;
 
@@ -41,7 +40,6 @@ public final class SkinnyStreamer {
      *                         If null or an empty String is passed in, the file will be given a name.
      * @param sheetContentList A List of objects implementing the SkinnySheetContent interface.
      *                         Each object in the List represents a sheet to be added to the .xlsx file.
-     * @param autoSizeColumn   Whether column width should be adjusted automatically. Using this option may impact performance.
      * @throws IOException Any Exception occurring while writing to the file system will remain uncaught.
      */
 
@@ -58,6 +56,74 @@ public final class SkinnyStreamer {
         columnHeaderCellStyle = SkinnyUtil.createColumnHeaderCellStyle(workbook);
     }
 
+    private void addSeveralSheetsToWorkbook(List<SkinnySheetContent> sheetContentList) {
+        for (SkinnySheetContent content : sheetContentList) {
+                addSheetToWorkbook(content);
+        }
+    }
+
+    private void addSheetToWorkbook(SkinnySheetContent content) {
+        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
+        if (content.hasColumnHeaders()) {
+            addColumnHeaderRow(currentSheet, content.getColumnHeaders());
+        }
+        addContentRows(currentSheet, content.getContentRows());
+    }
+
+    private void addColumnHeaderRow(SXSSFSheet currentSheet, List<String> columnHeaders) {
+        SXSSFRow headerRow = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
+
+        for (String text : columnHeaders) {
+            SXSSFCell cell = headerRow.createCell(headerRow.getPhysicalNumberOfCells());
+            cell.setCellValue(text);
+            cell.setCellStyle(columnHeaderCellStyle);
+        }
+
+        keepTrackOfColumnAmount(columnHeaders);
+        currentSheet.createFreezePane(0, 1);
+    }
+
+    private void addContentRows(SXSSFSheet currentSheet, List<List<String>> contentRows) {
+        for (List<String> contentRow : contentRows) {
+            addContentRow(currentSheet, contentRow);
+        }
+
+        if (currentSheet.getPhysicalNumberOfRows() < 100) {
+            adjustColumnSizes(currentSheet);
+        }
+    }
+
+    private void addContentRow(SXSSFSheet currentSheet, List<String> contentRow) {
+        if (contentRow == null) {
+            currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
+            return;
+        }
+
+        SXSSFRow row = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
+
+        for (String text : contentRow) {
+            SXSSFCell cell = row.createCell(row.getPhysicalNumberOfCells());
+            cell.setCellValue(text);
+        }
+
+        keepTrackOfColumnAmount(contentRow);
+
+        if (currentSheet.getPhysicalNumberOfRows() == 100) {
+            adjustColumnSizes(currentSheet);
+        }
+
+    }
+
+    private void keepTrackOfColumnAmount(List<String> rowAdded) {
+        currentColumnAmount = Math.max(rowAdded.size(), currentColumnAmount);
+    }
+
+    private void adjustColumnSizes(SXSSFSheet currentSheet) {
+        currentSheet.trackAllColumnsForAutoSizing();
+        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
+        currentSheet.untrackAllColumnsForAutoSizing();
+    }
+
     private void writeToFile() throws IOException {
         targetFile.createNewFile();
         FileOutputStream outputStream = new FileOutputStream(targetFile);
@@ -69,64 +135,5 @@ public final class SkinnyStreamer {
     private void cleanUp() {
         workbook.dispose();
     }
-
-    private void addSeveralSheetsToWorkbook(List<SkinnySheetContent> sheetContentList) {
-        for (SkinnySheetContent content : sheetContentList) {
-            if (autoSizeColumn) {
-                addSheetToWorkbook_withAutoSize(content);
-            } else {
-                addSheetToWorkbook_noAutoSize(content);
-            }
-        }
-    }
-
-    private void addSheetToWorkbook_withAutoSize(SkinnySheetContent content) {
-        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
-        currentSheet.trackAllColumnsForAutoSizing();
-        if (content.hasColumnHeaders()) {
-            addColumnHeaderRow(currentSheet, content.getColumnHeaders());
-        }
-        addContentRows(currentSheet, content.getContentRows());
-        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
-    }
-
-    private void addSheetToWorkbook_noAutoSize(SkinnySheetContent content) {
-        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
-        if (content.hasColumnHeaders()) {
-            addColumnHeaderRow(currentSheet, content.getColumnHeaders());
-        }
-        addContentRows(currentSheet, content.getContentRows());
-    }
-
-    private void addColumnHeaderRow(SXSSFSheet currentSheet, List<String> columnHeaders) {
-        SXSSFRow headerRow = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
-        for (String text : columnHeaders) {
-            SXSSFCell cell = headerRow.createCell(headerRow.getPhysicalNumberOfCells());
-            cell.setCellValue(text);
-            cell.setCellStyle(columnHeaderCellStyle);
-        }
-        currentColumnAmount = Math.max(columnHeaders.size(), currentColumnAmount);
-        currentSheet.createFreezePane(0, 1);
-    }
-
-    private void addContentRows(SXSSFSheet currentSheet, List<List<String>> contentRows) {
-        for (List<String> contentRow : contentRows) {
-            addContentRow(currentSheet, contentRow);
-        }
-    }
-
-    private void addContentRow(SXSSFSheet currentSheet, List<String> contentRow) {
-        if (contentRow == null) {
-            currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
-            return;
-        }
-        SXSSFRow row = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
-        for (String text : contentRow) {
-            SXSSFCell cell = row.createCell(row.getPhysicalNumberOfCells());
-            cell.setCellValue(text);
-        }
-        currentColumnAmount = Math.max(contentRow.size(), currentColumnAmount);
-    }
-
 
 }
