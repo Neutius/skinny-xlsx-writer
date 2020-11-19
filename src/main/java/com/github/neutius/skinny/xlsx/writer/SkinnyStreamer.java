@@ -69,8 +69,71 @@ public final class SkinnyStreamer {
     }
 
     // Note that SXSSF allocates temporary files that you must always clean up explicitly, by calling the dispose method.
+
     private void cleanUp() {
         workbook.dispose();
+    }
+    static void writeContentToFileSystem_adjustForLast100RowsOnly(File targetFolder, String fileName, List<SkinnySheetContent>
+            sheetContentList, boolean autoSizeColumn) throws IOException {
+        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName, autoSizeColumn);
+        streamer.addSeveralSheetsToWorkbook_adjustForLast100RowsOnly(sheetContentList);
+        streamer.writeToFile();
+        streamer.cleanUp();
+    }
+
+    private void addSeveralSheetsToWorkbook_adjustForLast100RowsOnly(List<SkinnySheetContent> sheetContentList) {
+        for (SkinnySheetContent content : sheetContentList) {
+            addSheetToWorkbook_adjustForLast100RowsOnly(content);
+        }
+    }
+
+    private void addSheetToWorkbook_adjustForLast100RowsOnly(SkinnySheetContent content) {
+        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
+        if (content.hasColumnHeaders()) {
+            addColumnHeaderRow(currentSheet, content.getColumnHeaders());
+        }
+        addContentRows(currentSheet, content.getContentRows());
+
+        currentSheet.trackAllColumnsForAutoSizing();
+        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
+        currentSheet.untrackAllColumnsForAutoSizing();
+    }
+
+    static void writeContentToFileSystem_adjustForHeadersOnly(File targetFolder, String fileName, List<SkinnySheetContent>
+            sheetContentList, boolean autoSizeColumn) throws IOException {
+        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName, autoSizeColumn);
+        streamer.addSeveralSheetsToWorkbook_adjustForHeadersOnly(sheetContentList);
+        streamer.writeToFile();
+        streamer.cleanUp();
+    }
+
+    private void addSeveralSheetsToWorkbook_adjustForHeadersOnly(List<SkinnySheetContent> sheetContentList) {
+        for (SkinnySheetContent content : sheetContentList) {
+            addSheetToWorkbook_adjustForHeadersOnly(content);
+        }
+    }
+
+    private void addSheetToWorkbook_adjustForHeadersOnly(SkinnySheetContent content) {
+        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
+        if (content.hasColumnHeaders()) {
+            addColumnHeaderRow_adjustForHeadersOnly(currentSheet, content.getColumnHeaders());
+        }
+        addContentRows(currentSheet, content.getContentRows());
+    }
+
+    private void addColumnHeaderRow_adjustForHeadersOnly(SXSSFSheet currentSheet, List<String> columnHeaders) {
+        SXSSFRow headerRow = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
+        for (String text : columnHeaders) {
+            SXSSFCell cell = headerRow.createCell(headerRow.getPhysicalNumberOfCells());
+            cell.setCellValue(text);
+            cell.setCellStyle(columnHeaderCellStyle);
+        }
+        currentColumnAmount = Math.max(columnHeaders.size(), currentColumnAmount);
+        currentSheet.createFreezePane(0, 1);
+
+        currentSheet.trackAllColumnsForAutoSizing();
+        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
+        currentSheet.untrackAllColumnsForAutoSizing();
     }
 
     private void addSeveralSheetsToWorkbook(List<SkinnySheetContent> sheetContentList) {
