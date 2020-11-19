@@ -23,7 +23,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
     void writeContentToFileSystem_fileExists(@TempDir File targetFolder) throws IOException {
         SkinnySheetContent firstSheet = DefaultSheetContent.withoutHeaders(SHEET_NAME, List.of(List.of("Cell Content")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet));
 
         File expectedFile = new File(targetFolder, FILE_NAME + EXTENSION);
         assertThat(expectedFile).exists().isNotNull().isNotEmpty().isFile().canWrite().canRead();
@@ -33,7 +33,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
     void writeContentToFileSystem_firstSheetHasContent(@TempDir File targetFolder) throws IOException, InvalidFormatException {
         SkinnySheetContent firstSheet = DefaultSheetContent.withoutHeaders(SHEET_NAME, List.of(List.of("Cell Content")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(1);
@@ -48,7 +48,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
                 List.of("Row 2 Cell 1", "Row 2 Cell 2", "Row 2 Cell 3", "Row 2 Cell 4", "Row 2 Cell 5", "Row 2 Cell 6")));
         SkinnySheetContent thirdSheet = DefaultSheetContent.withoutHeaders("Third Sheet", List.of(List.of("Cell Content")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet, secondSheet, thirdSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet, secondSheet, thirdSheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(3);
@@ -75,7 +75,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
         SkinnySheetContent firstSheet = DefaultSheetContent.withHeaders(SHEET_NAME, List.of("Header 1", "Header 2"),
                 List.of(List.of("Content 1", "Content 2")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(1);
@@ -96,7 +96,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
         SkinnySheetContent firstSheet = DefaultSheetContent.withHeaders(SHEET_NAME, List.of("Header 1", "Header 2"),
                 List.of(List.of("Content 1", "Content 2")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet));
 
         File actualFile = new File(targetFolder, FILE_NAME + EXTENSION);
         actualWorkbook = new XSSFWorkbook(actualFile);
@@ -118,7 +118,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
         SkinnySheetContent firstSheet = DefaultSheetContent.withHeaders(SHEET_NAME, List.of("Header 1", "Header 2"),
                 List.of(List.of("Content 1", "Content 2")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(firstSheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).isNotNull().isNotEmpty().hasSize(1);
@@ -139,26 +139,12 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
         SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME,
                 List.of(List.of("Short", "Medium-sized text", "Longer text to be added to content cell")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
         assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
-    }
-
-    @Test
-    void writeContentToFileSystem_noAutoSizeColumn_withoutHeaders_columnsHaveSameSize(@TempDir File targetFolder)
-            throws IOException, InvalidFormatException {
-        SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME,
-                List.of(List.of("Short", "Medium-sized text", "Longer text to be added to content cell")));
-
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), false);
-
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
-        assertThat(actualSheet.getColumnWidth(0)).isEqualTo(actualSheet.getColumnWidth(1));
-        assertThat(actualSheet.getColumnWidth(1)).isEqualTo(actualSheet.getColumnWidth(2));
     }
 
     @Test
@@ -168,27 +154,12 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
                 List.of("Short", "Medium-sized text", "Longer text to be added to content cell"),
                 List.of(List.of("")));
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
         assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
         assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
-    }
-
-    @Test
-    void writeContentToFileSystem_noAutoSizeColumn_withHeaders_columnsHaveSameSize(@TempDir File targetFolder)
-            throws IOException, InvalidFormatException {
-        SkinnySheetContent sheet = DefaultSheetContent.withHeaders(SHEET_NAME,
-                List.of("Short", "Medium-sized text", "Longer text to be added to content cell"),
-                List.of(List.of("")));
-
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), false);
-
-        actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
-        XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);
-        assertThat(actualSheet.getColumnWidth(0)).isEqualTo(actualSheet.getColumnWidth(1));
-        assertThat(actualSheet.getColumnWidth(1)).isEqualTo(actualSheet.getColumnWidth(2));
     }
 
     @Test
@@ -200,7 +171,7 @@ class SkinnyStreamerTest extends AbstractSkinnyWriterTestBase {
         contentRows.add(List.of("Row 3 Cell 1", "Row 3 Cell 2"));
         SkinnySheetContent sheet = DefaultSheetContent.withoutHeaders(SHEET_NAME, contentRows);
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet), true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, List.of(sheet));
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         XSSFSheet actualSheet = actualWorkbook.getSheet(SHEET_NAME);

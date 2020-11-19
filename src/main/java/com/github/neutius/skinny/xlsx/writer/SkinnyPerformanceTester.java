@@ -89,7 +89,7 @@ class SkinnyPerformanceTester {
         String methodName = "skinnyStreamer_currentVersion_noAutoAdjust--------";
 
         Instant start = Instant.now();
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, methodName + counter++, sheetContentList, false);
+//        SkinnyStreamer.writeContentToFileSystem(targetFolder, methodName + counter++, sheetContentList, false);
         Instant end = Instant.now();
 
         Duration timeElapsed = Duration.between(start, end);
@@ -100,7 +100,7 @@ class SkinnyPerformanceTester {
         String methodName = "skinnyStreamer_currentVersion_withAutoAdjust------";
 
         Instant start = Instant.now();
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, methodName + counter++, sheetContentList, true);
+//        SkinnyStreamer.writeContentToFileSystem(targetFolder, methodName + counter++, sheetContentList, true);
         Instant end = Instant.now();
 
         Duration timeElapsed = Duration.between(start, end);
@@ -111,7 +111,7 @@ class SkinnyPerformanceTester {
         String methodName = "skinnyStreamer_newVersion_adjustForHeadersOnly----";
 
         Instant start = Instant.now();
-        SkinnyStreamer.writeContentToFileSystem_adjustForHeadersOnly(targetFolder, methodName + counter++, sheetContentList, true);
+//        SkinnyStreamer.writeContentToFileSystem_adjustForHeadersOnly(targetFolder, methodName + counter++, sheetContentList, true);
         Instant end = Instant.now();
 
         Duration timeElapsed = Duration.between(start, end);
@@ -122,7 +122,7 @@ class SkinnyPerformanceTester {
         String methodName = "skinnyStreamer_newVersion_adjustForLast100RowsOnly";
 
         Instant start = Instant.now();
-        SkinnyStreamer.writeContentToFileSystem_adjustForLast100RowsOnly(targetFolder, methodName + counter++, sheetContentList, true);
+//        SkinnyStreamer.writeContentToFileSystem_adjustForLast100RowsOnly(targetFolder, methodName + counter++, sheetContentList, true);
         Instant end = Instant.now();
 
         Duration timeElapsed = Duration.between(start, end);

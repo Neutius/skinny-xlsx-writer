@@ -1,7 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -14,9 +13,9 @@ import java.util.List;
 
 /**
  * This class has a single public static method that writes a .xlsx file to disk
- *
+ * <p>
  * This class uses the Apache POI SXSSF streaming API to improve performance.
- *
+ * <p>
  * This class is currently in beta.
  */
 
@@ -24,15 +23,15 @@ public final class SkinnyStreamer {
     private final File targetFile;
     private final SXSSFWorkbook workbook;
     private final CellStyle columnHeaderCellStyle;
-    private final boolean autoSizeColumn;
+    private final boolean autoSizeColumn = true;
 
     private int currentColumnAmount = 1;
 
     /**
      * Offers basically the same functionality as the SkinnyWriter method of the same name - there might be some small differences.
-     *
+     * <p>
      * This method uses the Apache POI SXSSF streaming API to improve performance.
-     *
+     * <p>
      * This method is currently in beta.
      *
      * @param targetFolder     The target location for the .xlsx file
@@ -46,19 +45,17 @@ public final class SkinnyStreamer {
      * @throws IOException Any Exception occurring while writing to the file system will remain uncaught.
      */
 
-    public static void writeContentToFileSystem(File targetFolder, String fileName, List<SkinnySheetContent> sheetContentList,
-                                                boolean autoSizeColumn) throws IOException {
-        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName, autoSizeColumn);
+    public static void writeContentToFileSystem(File targetFolder, String fileName, List<SkinnySheetContent> sheetContentList) throws IOException {
+        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName);
         streamer.addSeveralSheetsToWorkbook(sheetContentList);
         streamer.writeToFile();
         streamer.cleanUp();
     }
 
-    private SkinnyStreamer(File targetFolder, String fileName, boolean autoSizeColumn) {
+    private SkinnyStreamer(File targetFolder, String fileName) {
         targetFile = new File(targetFolder, SkinnyUtil.sanitizeFileName(fileName) + SkinnyUtil.EXTENSION);
         workbook = new SXSSFWorkbook();
         columnHeaderCellStyle = SkinnyUtil.createColumnHeaderCellStyle(workbook);
-        this.autoSizeColumn = autoSizeColumn;
     }
 
     private void writeToFile() throws IOException {
@@ -69,79 +66,15 @@ public final class SkinnyStreamer {
     }
 
     // Note that SXSSF allocates temporary files that you must always clean up explicitly, by calling the dispose method.
-
     private void cleanUp() {
         workbook.dispose();
-    }
-    static void writeContentToFileSystem_adjustForLast100RowsOnly(File targetFolder, String fileName, List<SkinnySheetContent>
-            sheetContentList, boolean autoSizeColumn) throws IOException {
-        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName, autoSizeColumn);
-        streamer.addSeveralSheetsToWorkbook_adjustForLast100RowsOnly(sheetContentList);
-        streamer.writeToFile();
-        streamer.cleanUp();
-    }
-
-    private void addSeveralSheetsToWorkbook_adjustForLast100RowsOnly(List<SkinnySheetContent> sheetContentList) {
-        for (SkinnySheetContent content : sheetContentList) {
-            addSheetToWorkbook_adjustForLast100RowsOnly(content);
-        }
-    }
-
-    private void addSheetToWorkbook_adjustForLast100RowsOnly(SkinnySheetContent content) {
-        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
-        if (content.hasColumnHeaders()) {
-            addColumnHeaderRow(currentSheet, content.getColumnHeaders());
-        }
-        addContentRows(currentSheet, content.getContentRows());
-
-        currentSheet.trackAllColumnsForAutoSizing();
-        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
-        currentSheet.untrackAllColumnsForAutoSizing();
-    }
-
-    static void writeContentToFileSystem_adjustForHeadersOnly(File targetFolder, String fileName, List<SkinnySheetContent>
-            sheetContentList, boolean autoSizeColumn) throws IOException {
-        SkinnyStreamer streamer = new SkinnyStreamer(targetFolder, fileName, autoSizeColumn);
-        streamer.addSeveralSheetsToWorkbook_adjustForHeadersOnly(sheetContentList);
-        streamer.writeToFile();
-        streamer.cleanUp();
-    }
-
-    private void addSeveralSheetsToWorkbook_adjustForHeadersOnly(List<SkinnySheetContent> sheetContentList) {
-        for (SkinnySheetContent content : sheetContentList) {
-            addSheetToWorkbook_adjustForHeadersOnly(content);
-        }
-    }
-
-    private void addSheetToWorkbook_adjustForHeadersOnly(SkinnySheetContent content) {
-        SXSSFSheet currentSheet = workbook.createSheet(SkinnyUtil.sanitizeSheetName(content.getSheetName(), workbook));
-        if (content.hasColumnHeaders()) {
-            addColumnHeaderRow_adjustForHeadersOnly(currentSheet, content.getColumnHeaders());
-        }
-        addContentRows(currentSheet, content.getContentRows());
-    }
-
-    private void addColumnHeaderRow_adjustForHeadersOnly(SXSSFSheet currentSheet, List<String> columnHeaders) {
-        SXSSFRow headerRow = currentSheet.createRow(currentSheet.getPhysicalNumberOfRows());
-        for (String text : columnHeaders) {
-            SXSSFCell cell = headerRow.createCell(headerRow.getPhysicalNumberOfCells());
-            cell.setCellValue(text);
-            cell.setCellStyle(columnHeaderCellStyle);
-        }
-        currentColumnAmount = Math.max(columnHeaders.size(), currentColumnAmount);
-        currentSheet.createFreezePane(0, 1);
-
-        currentSheet.trackAllColumnsForAutoSizing();
-        SkinnyUtil.adjustColumnSizesInCurrentSheet(currentSheet, currentColumnAmount);
-        currentSheet.untrackAllColumnsForAutoSizing();
     }
 
     private void addSeveralSheetsToWorkbook(List<SkinnySheetContent> sheetContentList) {
         for (SkinnySheetContent content : sheetContentList) {
             if (autoSizeColumn) {
                 addSheetToWorkbook_withAutoSize(content);
-            }
-            else {
+            } else {
                 addSheetToWorkbook_noAutoSize(content);
             }
         }

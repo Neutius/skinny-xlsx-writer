@@ -52,7 +52,7 @@ class OneStopShopMethodTest extends SkinnyWriterInterfaceHandlingTest {
             throws IOException, InvalidFormatException {
         List<SkinnySheetContent> sheetContentList = getSheetContentList();
 
-        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, sheetContentList, true);
+        SkinnyStreamer.writeContentToFileSystem(targetFolder, FILE_NAME, sheetContentList);
 
         actualWorkbook = new XSSFWorkbook(new File(targetFolder, FILE_NAME + EXTENSION));
         assertThat(actualWorkbook).hasSize(4);
