@@ -22,11 +22,11 @@ class SkinnyWriterSheetHandlingTest extends AbstractSkinnyWriterTestBase {
                 "also, we \t like \t tabs \t\t\t too \t much";
         String valueWithSpecialCharacters = " \\ \\ \" \" ; || ;; | , . \" ";
         String valueWithSeveralNewLines = "we \n use \n new \n lines \n\n\n\n within a \n single \n value";
-        String valueWithSingleNewLines = "First sentence.\nSecond sentence.";
+        String valueWithSingleNewLine = "First sentence.\nSecond sentence.";
 
         List<String> firstRow = List.of("short", "value", valueWithSpecialCharacters, longValue);
         List<String> secondRow = List.of("short", valueWithSeveralNewLines, "value");
-        List<String> thirdRow = List.of("short", valueWithSingleNewLines, "value");
+        List<String> thirdRow = List.of("short", valueWithSingleNewLine, "value");
         writer.addSeveralRowsToCurrentSheet(List.of(firstRow, secondRow, thirdRow));
 
         writeAndReadActualWorkbook(targetFolder);
