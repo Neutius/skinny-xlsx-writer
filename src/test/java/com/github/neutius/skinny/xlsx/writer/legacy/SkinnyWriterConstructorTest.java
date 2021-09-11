@@ -1,4 +1,4 @@
-package com.github.neutius.skinny.xlsx.writer;
+package com.github.neutius.skinny.xlsx.writer.legacy;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

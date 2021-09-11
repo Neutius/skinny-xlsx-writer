@@ -1,6 +1,5 @@
-package com.github.neutius.skinny.xlsx.writer;
+package com.github.neutius.skinny.xlsx.writer.legacy;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

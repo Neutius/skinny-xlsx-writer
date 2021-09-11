@@ -1,4 +1,4 @@
-package com.github.neutius.skinny.xlsx.writer;
+package com.github.neutius.skinny.xlsx.writer.legacy;
 
 import java.io.File;
 import java.io.IOException;
