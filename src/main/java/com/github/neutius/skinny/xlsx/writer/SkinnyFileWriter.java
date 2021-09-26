@@ -1,5 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxFileWriterWithOptionalFeedback;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,43 +16,19 @@ import java.util.Optional;
  * This class writes the content of an in memory Apache POI Workbook to an .xlsx file on the file system.
  * <p>
  * After any write action, feedback on the success of that write action is available in the form of a boolean.
- * Any IOException that was caught during that write action is also available, and might be rethrown by the client if so desired.
+ * Any Exception that was caught during that write action is also available, and can be rethrown by the client if so desired.
+ * <p>
+ * Of the Workbook implementation classes, both XSSFWorkbook (the default .xlsx Workbook) and SXSSFWorkbook (the streaming variant) are supported.
+ * Both of the experimental sub-classes of SXSSFWorkbook will probably work fine, but no guarantees can be given.
+ * The HSSFWorkbook implementation class is NOT supported, since that class is used for writing .xls files.
  */
-public class SkinnyFileWriter {
+public class SkinnyFileWriter implements XlsxFileWriterWithOptionalFeedback {
     private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
 
     private boolean lastWriteSuccessful;
     private Exception lastWriteException;
 
-    /**
-     * Provides feedback on the success of the previous write attempt.
-     * <p>
-     * Returns true if no Exception occurred during the previous write action.
-     * Returns false if an Exception did occur, or if no write action has been performed.
-     *
-     * @return A best-effort indication of whether your content has been written to the file system.
-     */
-    public boolean isLastWriteSuccessful() {
-        return lastWriteSuccessful;
-    }
-
-    /**
-     * Any Exception that occurs is stored and available for later retrieval, until another write action is performed.
-     *
-     * @return the Exception that may or may not have occurred during the previous write attempt.
-     */
-    public Optional<Exception> getLastWriteException() {
-        return Optional.ofNullable(lastWriteException);
-    }
-
-    /**
-     * Write the content of a Workbook to a File on the file system.
-     * Any exception that occurs wil be caught, logged and available for retrieval until this method is called again.
-     *
-     * @param content    The content to be written to the file system.
-     * @param outputFile The location of the file to be written.
-     *                   If this file already exists, a new file within the same directory will be created.
-     */
+    @Override
     public void write(Workbook content, File outputFile) {
         try {
             writeContentToFileSystem(content, sanitizeOutputFile(outputFile));
@@ -62,6 +39,16 @@ public class SkinnyFileWriter {
             lastWriteSuccessful = false;
             lastWriteException = e;
         }
+    }
+
+    @Override
+    public boolean isLastWriteSuccessful() {
+        return lastWriteSuccessful;
+    }
+
+    @Override
+    public Optional<Exception> getLastWriteException() {
+        return Optional.ofNullable(lastWriteException);
     }
 
     private void writeContentToFileSystem(Workbook content, File outputFile) throws IOException {
