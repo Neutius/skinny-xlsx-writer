@@ -31,6 +31,7 @@ class SkinnyFileWriterTest {
     void unsuccessfulWriteActionPerformed_getSuccess_notSuccessful() throws IOException {
         Workbook content = mock(Workbook.class);
         File outputFile = mock(File.class);
+        when(outputFile.getParentFile()).thenReturn(mock(File.class));
         when(outputFile.createNewFile()).thenThrow(testException);
 
         testSubject.write(content, outputFile);
@@ -77,6 +78,21 @@ class SkinnyFileWriterTest {
 
         assertThat(outputFile).exists();
         assertThat(targetFolder.listFiles()).hasSize(2);
+    }
+
+    @Test
+    void outputFileInNonExistentDirectory_writeToFile_bothDirectoryAndFileAreCreated(@TempDir File targetFolder) {
+        Workbook content = mock(Workbook.class);
+        File nonExistentDirectory = new File(targetFolder, "non-existent");
+        File outputFile = new File(nonExistentDirectory, "test.xlsx");
+
+        assertThat(outputFile).doesNotExist();
+        assertThat(targetFolder.listFiles()).hasSize(0);
+
+        testSubject.write(content, outputFile);
+
+        assertThat(outputFile).exists();
+        assertThat(targetFolder.listFiles()).hasSize(1);
     }
 
 

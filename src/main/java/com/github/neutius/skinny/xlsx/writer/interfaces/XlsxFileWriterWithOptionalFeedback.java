@@ -19,6 +19,7 @@ public interface XlsxFileWriterWithOptionalFeedback {
      * @param content    The content to be written to the file system.
      * @param outputFile The location of the file to be written.
      *                   If this file already exists, a new file within the same directory will be created.
+     *                   If this file is in a directory that does not exist, that directory and any non-existent parent directories will be created.
      */
     void write(Workbook content, File outputFile);
 
