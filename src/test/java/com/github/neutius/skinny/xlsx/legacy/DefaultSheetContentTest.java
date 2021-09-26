@@ -1,4 +1,4 @@
-package com.github.neutius.skinny.xlsx.writer.legacy;
+package com.github.neutius.skinny.xlsx.legacy;
 
 import org.junit.jupiter.api.Test;
 
