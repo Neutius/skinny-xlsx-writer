@@ -1,9 +1,13 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -74,9 +78,26 @@ class SkinnyWorkbookProviderTest {
         assertThat(workbook.getSheetAt(0).getRow(3).getCell(3).getStringCellValue()).isEqualTo("0-3-3");
     }
 
-    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
     void addSeveralSheetsWithNoName_sheetsHaveUniqueNames() {
+        SheetContentSupplier sameSheet = () -> List.of(() -> List.of("value-1"));
+        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(sameSheet, sameSheet, sameSheet));
+
+        Workbook workbook = testSubject.getWorkbook();
+        String sheetName0 = workbook.getSheetAt(0).getSheetName();
+        String sheetName1 = workbook.getSheetAt(1).getSheetName();
+        String sheetName2 = workbook.getSheetAt(2).getSheetName();
+
+        assertThat(sheetName0).isNotEqualTo(sheetName1);
+        assertThat(sheetName0).isNotEqualTo(sheetName2);
+        assertThat(sheetName1).isNotEqualTo(sheetName2);
+    }
+
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
+    @Test
+    void addSeveralSheetsWithTheSameName_sheetsHaveUniqueNames() {
+        // There currently is no way to set a name for sheets
+
         // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
     }
 
