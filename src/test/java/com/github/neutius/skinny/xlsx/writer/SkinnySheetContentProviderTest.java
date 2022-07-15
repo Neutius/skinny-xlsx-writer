@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxRowContentProvider;
+import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,56 +13,56 @@ class SkinnySheetContentProviderTest {
     private static final String VALUE_2 = "value2";
     private static final String VALUE_3 = "value3";
 
-    private SkinnySheetContentProvider testSubject;
+    private SkinnySheetContentSupplier testSubject;
 
     @Test
     void createInstance_getRowContentProviders_resultIsEmpty() {
-        testSubject = new SkinnySheetContentProvider();
+        testSubject = new SkinnySheetContentSupplier();
 
-        List<XlsxRowContentProvider> rowContentProviders = testSubject.getRowContentProviders();
+        List<RowContentSupplier> rowContentProviders = testSubject.get();
 
         assertThat(rowContentProviders).isNotNull().isEmpty();
     }
 
     @Test
     void addRowContentProvider_getRowContentProviders_inputIsIncluded() {
-        testSubject = new SkinnySheetContentProvider();
-        SkinnyRowContentProvider rowContentProvider = new SkinnyRowContentProvider();
+        testSubject = new SkinnySheetContentSupplier();
+        SkinnyRowContentSupplier rowContentProvider = new SkinnyRowContentSupplier();
         testSubject.addRowContentProvider(rowContentProvider);
 
-        List<XlsxRowContentProvider> rowContentProviders = testSubject.getRowContentProviders();
+        List<RowContentSupplier> rowContentProviders = testSubject.get();
 
         assertThat(rowContentProviders).contains(rowContentProvider);
     }
 
     @Test
     void addRowContentWithProvider_getRowContentProviders_sameValuesAreReturned() {
-        testSubject = new SkinnySheetContentProvider();
-        testSubject.addRowContentProvider(new SkinnyRowContentProvider(VALUE_1, VALUE_2, VALUE_3));
+        testSubject = new SkinnySheetContentSupplier();
+        testSubject.addRowContentProvider(new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3));
 
-        List<XlsxRowContentProvider> rowContentProviders = testSubject.getRowContentProviders();
+        List<RowContentSupplier> rowContentProviders = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).getRowContent()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentProviders.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
     void addRowContentAsVarArgs_getRowContentProviders_sameValuesAreReturned() {
-        testSubject = new SkinnySheetContentProvider();
+        testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(VALUE_1, VALUE_2, VALUE_3);
 
-        List<XlsxRowContentProvider> rowContentProviders = testSubject.getRowContentProviders();
+        List<RowContentSupplier> rowContentProviders = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).getRowContent()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentProviders.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
     void addRowContentAsCollection_getRowContentProviders_sameValuesAreReturned() {
-        testSubject = new SkinnySheetContentProvider();
+        testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(Set.of(VALUE_1, VALUE_2, VALUE_3));
 
-        List<XlsxRowContentProvider> rowContentProviders = testSubject.getRowContentProviders();
+        List<RowContentSupplier> rowContentProviders = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).getRowContent()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentProviders.get(0).get()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxRowContentProvider;
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxSheetContentProvider;
+import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -15,14 +15,14 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         workbook = new SXSSFWorkbook();
     }
 
-    public void addSheet(XlsxSheetContentProvider sheetContentProvider) {
+    public void addSheet(SheetContentSupplier sheetContentProvider) {
         SXSSFSheet sheet = workbook.createSheet();
-        sheetContentProvider.getRowContentProviders().forEach(row -> addRowToSheet(row, sheet));
+        sheetContentProvider.get().forEach(row -> addRowToSheet(row, sheet));
     }
 
-    private void addRowToSheet(XlsxRowContentProvider rowContent, SXSSFSheet sheet) {
+    private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
         SXSSFRow row = sheet.createRow(sheet.getPhysicalNumberOfRows());
-        rowContent.getRowContent().forEach(cell -> addCellToRow(cell, row));
+        rowContent.get().forEach(cell -> addCellToRow(cell, row));
     }
 
     private void addCellToRow(String cellContent, SXSSFRow row) {

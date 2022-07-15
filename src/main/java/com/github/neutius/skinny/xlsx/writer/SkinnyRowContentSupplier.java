@@ -1,24 +1,24 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxRowContentProvider;
+import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class SkinnyRowContentProvider implements XlsxRowContentProvider {
+public class SkinnyRowContentSupplier implements RowContentSupplier {
     private final List<String> rowContent;
 
-    public SkinnyRowContentProvider() {
+    public SkinnyRowContentSupplier() {
         rowContent = new ArrayList<>();
     }
 
-    public SkinnyRowContentProvider(Collection<String> initialContent) {
+    public SkinnyRowContentSupplier(Collection<String> initialContent) {
         rowContent = new ArrayList<>(initialContent);
     }
 
-    public SkinnyRowContentProvider(String... initialContent) {
+    public SkinnyRowContentSupplier(String... initialContent) {
         rowContent = new ArrayList<>(Arrays.asList(initialContent));
     }
 
@@ -27,7 +27,7 @@ public class SkinnyRowContentProvider implements XlsxRowContentProvider {
     }
 
     @Override
-    public List<String> getRowContent() {
+    public List<String> get() {
         return rowContent;
     }
 

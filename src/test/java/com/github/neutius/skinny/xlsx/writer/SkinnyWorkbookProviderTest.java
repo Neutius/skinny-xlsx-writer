@@ -30,7 +30,7 @@ class SkinnyWorkbookProviderTest {
     @Test
     void workbookIsEmpty_addSheet_workbookHasSheet() {
         testSubject = new SkinnyWorkbookProvider();
-        SkinnySheetContentProvider sheetContentProvider = new SkinnySheetContentProvider();
+        SkinnySheetContentSupplier sheetContentProvider = new SkinnySheetContentSupplier();
         sheetContentProvider.addContentRow("value1");
 
         testSubject.addSheet(sheetContentProvider);
@@ -43,7 +43,7 @@ class SkinnyWorkbookProviderTest {
     @Test
     void addSheetWithSeveralRowsAndColumns_allCellValuesAreInTheRightPlace() {
         testSubject = new SkinnyWorkbookProvider();
-        SkinnySheetContentProvider sheetContentProvider = new SkinnySheetContentProvider();
+        SkinnySheetContentSupplier sheetContentProvider = new SkinnySheetContentSupplier();
         sheetContentProvider.addContentRow("0-0-0", "0-0-1", "0-0-2", "0-0-3");
         sheetContentProvider.addContentRow("0-1-0", "0-1-1", "0-1-2", "0-1-3");
         sheetContentProvider.addContentRow("0-2-0", "0-2-1", "0-2-2", "0-2-3");

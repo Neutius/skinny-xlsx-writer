@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer.alt;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxRowContentProvider;
+import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ObjectTreeFlatMapper<T> implements XlsxRowContentProvider {
+public class ObjectTreeFlatMapper<T> implements RowContentSupplier {
     public static final int DEFAULT_DEPTH = 0;
 
     private final ArrayList<String> rowContent;
@@ -75,7 +75,7 @@ public class ObjectTreeFlatMapper<T> implements XlsxRowContentProvider {
     }
 
     @Override
-    public List<String> getRowContent() {
+    public List<String> get() {
         return rowContent;
     }
 }

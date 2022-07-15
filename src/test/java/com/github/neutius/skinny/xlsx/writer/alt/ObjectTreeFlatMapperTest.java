@@ -19,7 +19,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObject> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(testSubject.get()).isNotNull().isNotEmpty().hasSize(3);
     }
 
     @Test
@@ -28,7 +28,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectSubClass> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).isNotNull().isNotEmpty().hasSize(5);
+        assertThat(testSubject.get()).isNotNull().isNotEmpty().hasSize(5);
     }
 
     @Test
@@ -37,7 +37,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectWithPrivateGetter> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).isNotNull().isNotEmpty().hasSize(3);
+        assertThat(testSubject.get()).isNotNull().isNotEmpty().hasSize(3);
     }
 
     @Test
@@ -46,7 +46,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObject> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).containsExactlyInAnyOrder(NAME, ID, COLOR);
+        assertThat(testSubject.get()).containsExactlyInAnyOrder(NAME, ID, COLOR);
     }
 
     @Test
@@ -55,7 +55,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectSubClass> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).containsExactlyInAnyOrder(NAME, ID, COLOR, SONG, MOVIE);
+        assertThat(testSubject.get()).containsExactlyInAnyOrder(NAME, ID, COLOR, SONG, MOVIE);
     }
 
     @Test
@@ -64,7 +64,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectWithPrivateGetter> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).containsExactlyInAnyOrder(NAME, ID, COLOR);
+        assertThat(testSubject.get()).containsExactlyInAnyOrder(NAME, ID, COLOR);
     }
 
     @Test
@@ -73,7 +73,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectSubClass> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).containsExactly(COLOR, MOVIE, SONG, ID, NAME);
+        assertThat(testSubject.get()).containsExactly(COLOR, MOVIE, SONG, ID, NAME);
     }
 
     @Test
@@ -82,7 +82,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringsAndPrimitivesTestObject> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).isNotNull().isNotEmpty().hasSize(7);
+        assertThat(testSubject.get()).isNotNull().isNotEmpty().hasSize(7);
     }
 
     @Test
@@ -91,7 +91,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringsAndPrimitivesTestObject> testSubject = new ObjectTreeFlatMapper<>(input);
 
-        assertThat(testSubject.getRowContent()).containsExactlyInAnyOrder(NAME, ID, COLOR, "23", "1.83", "true", "false");
+        assertThat(testSubject.get()).containsExactlyInAnyOrder(NAME, ID, COLOR, "23", "1.83", "true", "false");
     }
 
     @Disabled("Failing test for experimental code")
@@ -102,7 +102,7 @@ class ObjectTreeFlatMapperTest {
 
         ObjectTreeFlatMapper<StringValueTestObjectWithValueObjectFields> testSubject = new ObjectTreeFlatMapper<>(input, 0);
 
-        assertThat(testSubject.getRowContent()).isNotNull().isNotEmpty().hasSize(6);
+        assertThat(testSubject.get()).isNotNull().isNotEmpty().hasSize(6);
     }
 
 }
