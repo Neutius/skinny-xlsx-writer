@@ -1,5 +1,10 @@
-package com.github.neutius.skinny.xlsx.writer.alt;
+package com.github.neutius.skinny.xlsx.beta;
 
+import com.github.neutius.skinny.xlsx.test.StringValueTestObject;
+import com.github.neutius.skinny.xlsx.test.StringValueTestObjectSubClass;
+import com.github.neutius.skinny.xlsx.test.StringValueTestObjectWithPrivateGetter;
+import com.github.neutius.skinny.xlsx.test.StringValueTestObjectWithValueObjectFields;
+import com.github.neutius.skinny.xlsx.test.StringsAndPrimitivesTestObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package com.github.neutius.skinny.xlsx.writer.alt;
+package com.github.neutius.skinny.xlsx.beta;
 
 import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 
