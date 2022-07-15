@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SkinnySheetContentProviderTest {
+class SkinnySheetContentSupplierTest {
     private static final String VALUE_1 = "value1";
     private static final String VALUE_2 = "value2";
     private static final String VALUE_3 = "value3";
@@ -16,7 +16,7 @@ class SkinnySheetContentProviderTest {
     private SkinnySheetContentSupplier testSubject;
 
     @Test
-    void createInstance_getRowContentProviders_resultIsEmpty() {
+    void createInstance_resultIsEmpty() {
         testSubject = new SkinnySheetContentSupplier();
 
         List<RowContentSupplier> rowContentProviders = testSubject.get();
@@ -25,7 +25,7 @@ class SkinnySheetContentProviderTest {
     }
 
     @Test
-    void addRowContentProvider_getRowContentProviders_inputIsIncluded() {
+    void addRowContentProvider_inputIsIncluded() {
         testSubject = new SkinnySheetContentSupplier();
         SkinnyRowContentSupplier rowContentProvider = new SkinnyRowContentSupplier();
         testSubject.addRowContentProvider(rowContentProvider);
@@ -36,7 +36,7 @@ class SkinnySheetContentProviderTest {
     }
 
     @Test
-    void addRowContentWithProvider_getRowContentProviders_sameValuesAreReturned() {
+    void addRowContentWithProvider_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addRowContentProvider(new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3));
 
@@ -46,7 +46,7 @@ class SkinnySheetContentProviderTest {
     }
 
     @Test
-    void addRowContentAsVarArgs_getRowContentProviders_sameValuesAreReturned() {
+    void addRowContentAsVarArgs_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(VALUE_1, VALUE_2, VALUE_3);
 
@@ -56,7 +56,7 @@ class SkinnySheetContentProviderTest {
     }
 
     @Test
-    void addRowContentAsCollection_getRowContentProviders_sameValuesAreReturned() {
+    void addRowContentAsCollection_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(Set.of(VALUE_1, VALUE_2, VALUE_3));
 

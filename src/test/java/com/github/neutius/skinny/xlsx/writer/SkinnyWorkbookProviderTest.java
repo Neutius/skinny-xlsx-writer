@@ -2,6 +2,7 @@ package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +11,7 @@ class SkinnyWorkbookProviderTest {
     private SkinnyWorkbookProvider testSubject;
 
     @Test
-    void createInstance_getWorkbook_workbookExists() {
+    void createInstance_isEmpty() {
         testSubject = new SkinnyWorkbookProvider();
 
         Workbook workbook = testSubject.getWorkbook();
@@ -19,7 +20,7 @@ class SkinnyWorkbookProviderTest {
     }
 
     @Test
-    void createInstance_getWorkbook_isXlsxWorkbook() {
+    void createInstance_isXlsxWorkbook() {
         testSubject = new SkinnyWorkbookProvider();
 
         Workbook workbook = testSubject.getWorkbook();
@@ -28,7 +29,7 @@ class SkinnyWorkbookProviderTest {
     }
 
     @Test
-    void workbookIsEmpty_addSheet_workbookHasSheet() {
+    void addSheetToEmptyWorkbook_workbookHasSheet() {
         testSubject = new SkinnyWorkbookProvider();
         SkinnySheetContentSupplier sheetContentProvider = new SkinnySheetContentSupplier();
         sheetContentProvider.addContentRow("value1");
@@ -71,6 +72,12 @@ class SkinnyWorkbookProviderTest {
         assertThat(workbook.getSheetAt(0).getRow(3).getCell(1).getStringCellValue()).isEqualTo("0-3-1");
         assertThat(workbook.getSheetAt(0).getRow(3).getCell(2).getStringCellValue()).isEqualTo("0-3-2");
         assertThat(workbook.getSheetAt(0).getRow(3).getCell(3).getStringCellValue()).isEqualTo("0-3-3");
+    }
+
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
+    @Test
+    void addSeveralSheetsWithNoName_sheetsHaveUniqueNames() {
+        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
     }
 
 }

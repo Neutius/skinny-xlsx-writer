@@ -1,5 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SkinnyRowContentProviderTest {
+class SkinnyRowContentSupplierTest {
     private static final String VALUE_1 = "value1";
     private static final String VALUE_2 = "value2";
     private static final String VALUE_3 = "value3";
@@ -15,7 +16,7 @@ class SkinnyRowContentProviderTest {
     private SkinnyRowContentSupplier testSubject;
 
     @Test
-    void createInstance_getRowContent_rowContentIsEmpty() {
+    void createInstance_rowContentIsEmpty() {
         testSubject = new SkinnyRowContentSupplier();
 
         List<String> rowContent = testSubject.get();
@@ -24,7 +25,7 @@ class SkinnyRowContentProviderTest {
     }
 
     @Test
-    void addCellContent_getRowContent_cellContentIsIncluded() {
+    void addCellContent_cellContentIsIncluded() {
         testSubject = new SkinnyRowContentSupplier();
         testSubject.addCellContent(VALUE_1);
 
@@ -34,7 +35,7 @@ class SkinnyRowContentProviderTest {
     }
 
     @Test
-    void addCellContentThreeTimes_getRowContent_allCellContentIsIncludedInTheSameOrder() {
+    void addCellContentThreeTimes_allCellContentIsIncludedInTheSameOrder() {
         testSubject = new SkinnyRowContentSupplier();
         testSubject.addCellContent(VALUE_1);
         testSubject.addCellContent(VALUE_2);
@@ -45,8 +46,20 @@ class SkinnyRowContentProviderTest {
         assertThat(rowContent).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
-    void createInstanceWithVarArgs_getRowContent_constructorParametersAreIncluded() {
+    void addNullValue_isReplacedWithEmptyString() {
+        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+    }
+
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
+    @Test
+    void addBlankValues_areReplacedWithEmptyString() {
+        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+    }
+
+    @Test
+    void createInstanceWithVarArgs_constructorParametersAreIncluded() {
         testSubject = new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3);
 
         List<String> rowContent = testSubject.get();
@@ -54,13 +67,25 @@ class SkinnyRowContentProviderTest {
         assertThat(rowContent).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
-    void createInstanceWithCollection_getRowContent_constructorParametersAreIncluded() {
+    void createInstanceWithVarArgsContainingBlankAndNullValues_areReplacedWithEmptyString() {
+        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+    }
+
+    @Test
+    void createInstanceWithCollection_constructorParametersAreIncluded() {
         testSubject = new SkinnyRowContentSupplier(Set.of(VALUE_1, VALUE_2, VALUE_3));
 
         List<String> rowContent = testSubject.get();
 
         assertThat(rowContent).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
+    }
+
+    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
+    @Test
+    void createInstanceWithCollectionContainingBlankAndNullValues_areReplacedWithEmptyString() {
+        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
     }
 
 }

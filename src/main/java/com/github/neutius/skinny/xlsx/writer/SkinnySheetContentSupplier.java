@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SkinnySheetContentSupplier implements SheetContentSupplier {
-    private final ArrayList<RowContentSupplier> rowContentProviders;
+    private final List<RowContentSupplier> rowContentProviders;
 
     // TODO Constructor overloads to feed RowContentProvider as Collection or as var args - GvdNL 26-09-2021
     public SkinnySheetContentSupplier() {

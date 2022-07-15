@@ -8,6 +8,8 @@ import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+import java.util.Collection;
+
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     private final SXSSFWorkbook workbook;
 
@@ -15,9 +17,18 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         workbook = new SXSSFWorkbook();
     }
 
-    public void addSheet(SheetContentSupplier sheetContentProvider) {
+    public SkinnyWorkbookProvider(Collection<SheetContentSupplier> sheetContentSuppliers) {
+        workbook = new SXSSFWorkbook();
+        sheetContentSuppliers.forEach(this::addSheetToWorkbook);
+    }
+
+    public void addSheet(SheetContentSupplier sheetContentSupplier) {
+        addSheetToWorkbook(sheetContentSupplier);
+    }
+
+    private void addSheetToWorkbook(SheetContentSupplier sheetContentSupplier) {
         SXSSFSheet sheet = workbook.createSheet();
-        sheetContentProvider.get().forEach(row -> addRowToSheet(row, sheet));
+        sheetContentSupplier.get().forEach(row -> addRowToSheet(row, sheet));
     }
 
     private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
