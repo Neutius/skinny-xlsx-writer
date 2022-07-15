@@ -31,10 +31,10 @@ class SkinnyWorkbookProviderTest {
     @Test
     void addSheetToEmptyWorkbook_workbookHasSheet() {
         testSubject = new SkinnyWorkbookProvider();
-        SkinnySheetContentSupplier sheetContentProvider = new SkinnySheetContentSupplier();
-        sheetContentProvider.addContentRow("value1");
+        SkinnySheetContentSupplier sheetContentSupplier = new SkinnySheetContentSupplier();
+        sheetContentSupplier.addContentRow("value1");
 
-        testSubject.addSheet(sheetContentProvider);
+        testSubject.addSheet(sheetContentSupplier);
         Workbook workbook = testSubject.getWorkbook();
 
         assertThat(workbook).isNotEmpty();
@@ -44,13 +44,13 @@ class SkinnyWorkbookProviderTest {
     @Test
     void addSheetWithSeveralRowsAndColumns_allCellValuesAreInTheRightPlace() {
         testSubject = new SkinnyWorkbookProvider();
-        SkinnySheetContentSupplier sheetContentProvider = new SkinnySheetContentSupplier();
-        sheetContentProvider.addContentRow("0-0-0", "0-0-1", "0-0-2", "0-0-3");
-        sheetContentProvider.addContentRow("0-1-0", "0-1-1", "0-1-2", "0-1-3");
-        sheetContentProvider.addContentRow("0-2-0", "0-2-1", "0-2-2", "0-2-3");
-        sheetContentProvider.addContentRow("0-3-0", "0-3-1", "0-3-2", "0-3-3");
+        SkinnySheetContentSupplier sheetContentSupplier = new SkinnySheetContentSupplier();
+        sheetContentSupplier.addContentRow("0-0-0", "0-0-1", "0-0-2", "0-0-3");
+        sheetContentSupplier.addContentRow("0-1-0", "0-1-1", "0-1-2", "0-1-3");
+        sheetContentSupplier.addContentRow("0-2-0", "0-2-1", "0-2-2", "0-2-3");
+        sheetContentSupplier.addContentRow("0-3-0", "0-3-1", "0-3-2", "0-3-3");
 
-        testSubject.addSheet(sheetContentProvider);
+        testSubject.addSheet(sheetContentSupplier);
         Workbook workbook = testSubject.getWorkbook();
 
         assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("0-0-0");

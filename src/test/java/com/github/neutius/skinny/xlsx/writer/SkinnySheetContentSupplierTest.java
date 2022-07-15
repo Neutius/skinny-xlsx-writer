@@ -19,30 +19,30 @@ class SkinnySheetContentSupplierTest {
     void createInstance_resultIsEmpty() {
         testSubject = new SkinnySheetContentSupplier();
 
-        List<RowContentSupplier> rowContentProviders = testSubject.get();
+        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
 
-        assertThat(rowContentProviders).isNotNull().isEmpty();
+        assertThat(rowContentSuppliers).isNotNull().isEmpty();
     }
 
     @Test
-    void addRowContentProvider_inputIsIncluded() {
+    void addRowContentSupplier_inputIsIncluded() {
         testSubject = new SkinnySheetContentSupplier();
-        SkinnyRowContentSupplier rowContentProvider = new SkinnyRowContentSupplier();
-        testSubject.addRowContentProvider(rowContentProvider);
+        SkinnyRowContentSupplier rowContentSupplier = new SkinnyRowContentSupplier();
+        testSubject.addRowContentSupplier(rowContentSupplier);
 
-        List<RowContentSupplier> rowContentProviders = testSubject.get();
+        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
 
-        assertThat(rowContentProviders).contains(rowContentProvider);
+        assertThat(rowContentSuppliers).contains(rowContentSupplier);
     }
 
     @Test
-    void addRowContentWithProvider_sameValuesAreReturned() {
+    void addRowContentWithSupplier_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
-        testSubject.addRowContentProvider(new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3));
+        testSubject.addRowContentSupplier(new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3));
 
-        List<RowContentSupplier> rowContentProviders = testSubject.get();
+        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
@@ -50,9 +50,9 @@ class SkinnySheetContentSupplierTest {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(VALUE_1, VALUE_2, VALUE_3);
 
-        List<RowContentSupplier> rowContentProviders = testSubject.get();
+        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
@@ -60,9 +60,9 @@ class SkinnySheetContentSupplierTest {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(Set.of(VALUE_1, VALUE_2, VALUE_3));
 
-        List<RowContentSupplier> rowContentProviders = testSubject.get();
+        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
 
-        assertThat(rowContentProviders.get(0).get()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(rowContentSuppliers.get(0).get()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
     }
 
 }

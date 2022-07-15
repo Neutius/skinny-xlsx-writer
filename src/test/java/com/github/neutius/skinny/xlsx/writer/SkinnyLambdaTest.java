@@ -12,9 +12,9 @@ public class SkinnyLambdaTest {
 
 	@Test
 	void useLambdasForSingleValue_valueIsPresent() {
-		XlsxWorkbookProvider provider = new SkinnyWorkbookProvider(List.of(() -> List.of(() -> List.of("value-1"))));
+		XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(() -> List.of(() -> List.of("value-1"))));
 
-		Workbook workbook = provider.getWorkbook();
+		Workbook workbook = testSubject.getWorkbook();
 
 		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("value-1");
 	}

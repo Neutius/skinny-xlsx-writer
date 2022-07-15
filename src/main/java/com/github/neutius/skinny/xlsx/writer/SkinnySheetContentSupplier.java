@@ -8,28 +8,28 @@ import java.util.Collection;
 import java.util.List;
 
 public class SkinnySheetContentSupplier implements SheetContentSupplier {
-    private final List<RowContentSupplier> rowContentProviders;
+    private final List<RowContentSupplier> rowContentSuppliers;
 
-    // TODO Constructor overloads to feed RowContentProvider as Collection or as var args - GvdNL 26-09-2021
+    // TODO Constructor overloads to feed RowContentSupplier as Collection or as var args - GvdNL 26-09-2021
     public SkinnySheetContentSupplier() {
-        rowContentProviders = new ArrayList<>();
+        rowContentSuppliers = new ArrayList<>();
     }
 
     @Override
     public List<RowContentSupplier> get() {
-        return rowContentProviders;
+        return rowContentSuppliers;
     }
 
-    public void addRowContentProvider(RowContentSupplier rowContentProvider) {
-        rowContentProviders.add(rowContentProvider);
+    public void addRowContentSupplier(RowContentSupplier rowContentSupplier) {
+        rowContentSuppliers.add(rowContentSupplier);
     }
 
     public void addContentRow(String... rowContent) {
-        rowContentProviders.add(new SkinnyRowContentSupplier(rowContent));
+        rowContentSuppliers.add(new SkinnyRowContentSupplier(rowContent));
     }
 
     public void addContentRow(Collection<String> rowContent) {
-        rowContentProviders.add(new SkinnyRowContentSupplier(rowContent));
+        rowContentSuppliers.add(new SkinnyRowContentSupplier(rowContent));
     }
 
 }

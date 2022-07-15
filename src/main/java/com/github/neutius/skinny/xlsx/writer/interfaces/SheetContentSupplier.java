@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 /*
  A sheet has more than content: it also has a name and optionally also column headers.
 
- Perhaps add a SheetNameSupplier and a ColumnHeaderProvider, both of which can be used by an implementation of SheetSupplier?
+ Perhaps add a SheetNameSupplier and a ColumnHeaderSupplier, both of which can be used by an implementation of SheetSupplier?
   - GvdNL 15-07-2022
  */
 
