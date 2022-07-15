@@ -9,9 +9,10 @@ import java.util.Optional;
  * Any implementation of this interface writes the content of an in memory Apache POI Workbook to a file on the file system.
  * <p>
  * After any write action, feedback on the success of that write action is available in the form of a boolean.
- * Any IOException that was caught during that write action is also available, and can be rethrown by the client if so desired.
+ * Any Exception that was caught during that write action is also available, and can be rethrown by the client if so desired.
  */
-public interface XlsxFileWriterWithOptionalFeedback {
+public interface XlsxFileWriter {
+
     /**
      * Write the content of a Workbook to a File on the file system.
      * Any exception that occurs wil be caught, and will remain available for retrieval until this method is called again.

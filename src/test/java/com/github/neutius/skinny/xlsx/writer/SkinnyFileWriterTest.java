@@ -86,14 +86,15 @@ class SkinnyFileWriterTest {
         File nonExistentDirectory = new File(targetFolder, "non-existent");
         File outputFile = new File(nonExistentDirectory, "test.xlsx");
 
-        assertThat(outputFile).doesNotExist();
         assertThat(targetFolder.listFiles()).hasSize(0);
+        assertThat(nonExistentDirectory).doesNotExist();
+        assertThat(outputFile).doesNotExist();
 
         testSubject.write(content, outputFile);
 
-        assertThat(outputFile).exists();
         assertThat(targetFolder.listFiles()).hasSize(1);
+        assertThat(nonExistentDirectory).exists();
+        assertThat(outputFile).exists();
     }
-
 
 }

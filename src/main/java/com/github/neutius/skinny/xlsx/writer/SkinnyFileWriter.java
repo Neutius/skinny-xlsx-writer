@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxFileWriterWithOptionalFeedback;
+import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxFileWriter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.util.Optional;
  * Both of the experimental sub-classes of SXSSFWorkbook will probably work fine, but no guarantees can be given.
  * The HSSFWorkbook implementation class is NOT supported, since that class is used for writing .xls files.
  */
-public class SkinnyFileWriter implements XlsxFileWriterWithOptionalFeedback {
+public class SkinnyFileWriter implements XlsxFileWriter {
     private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
 
     private boolean lastWriteSuccessful;
@@ -53,9 +53,11 @@ public class SkinnyFileWriter implements XlsxFileWriterWithOptionalFeedback {
 
     private void writeContentToFileSystem(Workbook content, File outputFile) throws IOException {
         outputFile.createNewFile();
-        FileOutputStream outputStream = new FileOutputStream(outputFile);
-        content.write(outputStream);
-        outputStream.close();
+
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+            content.write(outputStream);
+        }
+
     }
 
     private static File sanitizeOutputFile(File outputFile) {
