@@ -1,6 +1,7 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -12,6 +13,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SkinnyWorkbookProviderTest {
+    private static final String SHEET_NAME = "sheet name";
+
     private SkinnyWorkbookProvider testSubject;
 
     @Test
@@ -81,7 +84,8 @@ class SkinnyWorkbookProviderTest {
     @Test
     void addSeveralSheetsWithNoName_sheetsHaveUniqueNames() {
         SheetContentSupplier sameSheet = () -> List.of(() -> List.of("value-1"));
-        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(sameSheet, sameSheet, sameSheet));
+        SkinnySheetProvider provider = new SkinnySheetProvider(sameSheet);
+        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(provider, provider, provider));
 
         Workbook workbook = testSubject.getWorkbook();
         String sheetName0 = workbook.getSheetAt(0).getSheetName();
@@ -93,11 +97,20 @@ class SkinnyWorkbookProviderTest {
         assertThat(sheetName1).isNotEqualTo(sheetName2);
     }
 
+    @Test
+    void addSheetWithName_sheetHasName() {
+        SheetContentSupplier contentSupplier = () -> List.of(() -> List.of("value-1"));
+        SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME);
+        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+        Workbook workbook = testSubject.getWorkbook();
+
+        assertThat(workbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
+    }
+
     @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
     void addSeveralSheetsWithTheSameName_sheetsHaveUniqueNames() {
-        // There currently is no way to set a name for sheets
-
         // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
     }
 

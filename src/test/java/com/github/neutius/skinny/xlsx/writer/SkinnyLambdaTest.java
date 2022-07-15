@@ -12,7 +12,8 @@ public class SkinnyLambdaTest {
 
 	@Test
 	void useLambdasForSingleValue_valueIsPresent() {
-		XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(() -> List.of(() -> List.of("value-1"))));
+		SkinnySheetProvider provider = new SkinnySheetProvider(() -> List.of(() -> List.of("value-1")));
+		XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(provider));
 
 		Workbook workbook = testSubject.getWorkbook();
 

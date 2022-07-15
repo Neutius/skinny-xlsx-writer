@@ -2,6 +2,7 @@ package com.github.neutius.skinny.xlsx.writer;
 
 import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -13,22 +14,37 @@ import java.util.Collection;
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     private final SXSSFWorkbook workbook;
 
+    @Override
+    public SXSSFWorkbook getWorkbook() {
+        return workbook;
+    }
+
     public SkinnyWorkbookProvider() {
         workbook = new SXSSFWorkbook();
     }
 
-    public SkinnyWorkbookProvider(Collection<SheetContentSupplier> sheetContentSuppliers) {
+    public SkinnyWorkbookProvider(Collection<SheetProvider> sheetProviders) {
         workbook = new SXSSFWorkbook();
-        sheetContentSuppliers.forEach(this::addSheetToWorkbook);
+        sheetProviders.forEach(this::addSheetToWorkbook);
     }
 
     public void addSheet(SheetContentSupplier sheetContentSupplier) {
         addSheetToWorkbook(sheetContentSupplier);
     }
 
+    private void addSheetToWorkbook(SheetProvider sheetProvider) {
+        SXSSFSheet sheet = createSheet(sheetProvider.getSheetName());
+        sheetProvider.getSheetContentSupplier().get().forEach(row -> addRowToSheet(row, sheet));
+    }
+
     private void addSheetToWorkbook(SheetContentSupplier sheetContentSupplier) {
-        SXSSFSheet sheet = workbook.createSheet();
+        SXSSFSheet sheet = createSheet("");
         sheetContentSupplier.get().forEach(row -> addRowToSheet(row, sheet));
+    }
+
+    private SXSSFSheet createSheet(String sheetName) {
+        boolean hasName = sheetName != null && !(sheetName.isBlank());
+        return hasName ? workbook.createSheet(sheetName) : workbook.createSheet();
     }
 
     private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
@@ -39,11 +55,6 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     private void addCellToRow(String cellContent, SXSSFRow row) {
         SXSSFCell cell = row.createCell(row.getPhysicalNumberOfCells());
         cell.setCellValue(cellContent);
-    }
-
-    @Override
-    public SXSSFWorkbook getWorkbook() {
-        return workbook;
     }
 
 }
