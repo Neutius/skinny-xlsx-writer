@@ -83,6 +83,16 @@ class SkinnyWorkbookProviderTest {
     }
 
     @Test
+    void useLambdasForSingleValue_valueIsPresent() {
+        SkinnySheetProvider provider = new SkinnySheetProvider(() -> List.of(() -> List.of("value-1")));
+        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(provider));
+
+        Workbook workbook = testSubject.getWorkbook();
+
+        assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("value-1");
+    }
+
+    @Test
     void addSeveralSheetsWithNoName_sheetsHaveUniqueNames() {
         SheetContentSupplier sameSheet = () -> List.of(() -> List.of(VALUE_1));
         SkinnySheetProvider provider = new SkinnySheetProvider(sameSheet);

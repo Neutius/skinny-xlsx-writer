@@ -11,6 +11,8 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     private final SXSSFWorkbook workbook;
@@ -51,8 +53,8 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     }
 
     private SXSSFSheet createSheet(String sheetName) {
-        boolean hasName = sheetName != null && !(sheetName.isBlank());
-        return hasName ? workbook.createSheet(sanitizeSheetName(sheetName)) : workbook.createSheet();
+        boolean isValidName = sheetName != null && !(sheetName.isBlank());
+        return isValidName ? workbook.createSheet(sanitizeSheetName(sheetName)) : workbook.createSheet();
     }
 
     private String sanitizeSheetName(String sheetName) {
@@ -60,13 +62,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     }
 
     private boolean isUnique(String sheetName) {
-        for (Sheet sheet : workbook) {
-            if (sheet.getSheetName().equals(sheetName)) {
-                return false;
-            }
-        }
-
-        return true;
+        Set<String> sheetNamesInWorkbook = new HashSet<>();
+        workbook.forEach(sheet -> sheetNamesInWorkbook.add(sheet.getSheetName()));
+        return !sheetNamesInWorkbook.contains(sheetName);
     }
 
     private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
