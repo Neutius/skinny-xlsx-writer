@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SkinnyRowContentSupplier implements RowContentSupplier {
-    private final List<String> rowContent;
+    private final List<String> rowContent = new ArrayList<>();
 
     @Override
     public List<String> get() {
@@ -16,18 +16,21 @@ public class SkinnyRowContentSupplier implements RowContentSupplier {
     }
 
     public SkinnyRowContentSupplier() {
-        rowContent = new ArrayList<>();
     }
 
     public SkinnyRowContentSupplier(Collection<String> initialContent) {
-        rowContent = new ArrayList<>(initialContent);
+        initialContent.forEach(this::addCellContentToRow);
     }
 
     public SkinnyRowContentSupplier(String... initialContent) {
-        rowContent = new ArrayList<>(Arrays.asList(initialContent));
+        Arrays.asList(initialContent).forEach(this::addCellContentToRow);
     }
 
     public void addCellContent(String content) {
+        addCellContentToRow(content);
+    }
+
+    private void addCellContentToRow(String content) {
         rowContent.add(sanitizeCellContent(content));
     }
 
