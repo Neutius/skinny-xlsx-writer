@@ -19,7 +19,9 @@ public class SkinnyRowContentSupplier implements RowContentSupplier {
     }
 
     public SkinnyRowContentSupplier(Collection<String> initialContent) {
-        initialContent.forEach(this::addCellContentToRow);
+        if (initialContent != null) {
+            initialContent.forEach(this::addCellContentToRow);
+        }
     }
 
     public SkinnyRowContentSupplier(String... initialContent) {

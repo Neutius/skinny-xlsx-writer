@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SkinnySheetContentSupplier implements SheetContentSupplier {
-    private final List<RowContentSupplier> rowContentSuppliers;
+    private final List<RowContentSupplier> rowContentSuppliers = new ArrayList<>();
 
     @Override
     public List<RowContentSupplier> get() {
@@ -17,23 +17,36 @@ public class SkinnySheetContentSupplier implements SheetContentSupplier {
     }
 
     public SkinnySheetContentSupplier() {
-        rowContentSuppliers = new ArrayList<>();
     }
 
     public SkinnySheetContentSupplier(Collection<RowContentSupplier> initialContent) {
-        this.rowContentSuppliers = new ArrayList<>(initialContent);
+        initialContent.forEach(this::addRowContentSupplierToSheet);
     }
 
     public SkinnySheetContentSupplier(RowContentSupplier... initialContent) {
-        this.rowContentSuppliers = Arrays.asList(initialContent);
+        Arrays.asList(initialContent).forEach(this::addRowContentSupplierToSheet);
     }
 
     public void addRowContentSupplier(RowContentSupplier rowContentSupplier) {
-        rowContentSuppliers.add(rowContentSupplier);
+        addRowContentSupplierToSheet(rowContentSupplier);
+    }
+
+    private void addRowContentSupplierToSheet(RowContentSupplier rowContentSupplier) {
+        if (rowContentSupplier == null || rowContentSupplier.get() == null) {
+            rowContentSuppliers.add(new SkinnyRowContentSupplier());
+        }
+        else {
+            rowContentSuppliers.add(rowContentSupplier);
+        }
     }
 
     public void addContentRow(Collection<String> rowContent) {
-        rowContentSuppliers.add(new SkinnyRowContentSupplier(rowContent));
+        if (rowContent == null) {
+            rowContentSuppliers.add(new SkinnyRowContentSupplier());
+        }
+        else {
+            rowContentSuppliers.add(new SkinnyRowContentSupplier(rowContent));
+        }
     }
 
     public void addContentRow(String... rowContent) {

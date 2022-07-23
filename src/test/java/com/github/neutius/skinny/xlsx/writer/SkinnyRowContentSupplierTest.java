@@ -78,25 +78,6 @@ class SkinnyRowContentSupplierTest {
     }
 
     @Test
-    void createInstanceWithVarArgs_constructorParametersAreIncluded() {
-        testSubject = new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3);
-
-        List<String> rowContent = testSubject.get();
-
-        assertThat(rowContent).containsExactly(VALUE_1, VALUE_2, VALUE_3);
-    }
-
-    @Test
-    void createInstanceWithVarArgsContainingBlankAndNullValues_areReplacedWithEmptyString() {
-        testSubject = new SkinnyRowContentSupplier(NULL_VALUE, SPACES, NEW_LINES, TABS);
-
-        List<String> rowContent = testSubject.get();
-
-        assertThat(rowContent).containsExactly(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
-        assertThat(rowContent).doesNotContain(NULL_VALUE, SPACES, NEW_LINES, TABS);
-    }
-
-    @Test
     void createInstanceWithCollection_constructorParametersAreIncluded() {
         testSubject = new SkinnyRowContentSupplier(Set.of(VALUE_1, VALUE_2, VALUE_3));
 
@@ -108,6 +89,34 @@ class SkinnyRowContentSupplierTest {
     @Test
     void createInstanceWithCollectionContainingBlankAndNullValues_areReplacedWithEmptyString() {
         testSubject = new SkinnyRowContentSupplier(Arrays.asList(NULL_VALUE, SPACES, NEW_LINES, TABS));
+
+        List<String> rowContent = testSubject.get();
+
+        assertThat(rowContent).containsExactly(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+        assertThat(rowContent).doesNotContain(NULL_VALUE, SPACES, NEW_LINES, TABS);
+    }
+
+    @Test
+    void createInstanceWithNullCollection_areReplacedWithEmptyList() {
+        testSubject = new SkinnyRowContentSupplier((Set<String>) null);
+
+        List<String> rowContent = testSubject.get();
+
+        assertThat(rowContent).isNotNull().isEmpty();
+    }
+
+    @Test
+    void createInstanceWithVarArgs_constructorParametersAreIncluded() {
+        testSubject = new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3);
+
+        List<String> rowContent = testSubject.get();
+
+        assertThat(rowContent).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+    }
+
+    @Test
+    void createInstanceWithVarArgsContainingBlankAndNullValues_areReplacedWithEmptyString() {
+        testSubject = new SkinnyRowContentSupplier(NULL_VALUE, SPACES, NEW_LINES, TABS);
 
         List<String> rowContent = testSubject.get();
 
