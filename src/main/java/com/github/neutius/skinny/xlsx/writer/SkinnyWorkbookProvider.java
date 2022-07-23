@@ -29,6 +29,13 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         sheetProviders.forEach(this::addSheetToWorkbook);
     }
 
+    /*
+    The separate "addSheet" method consumes a SheetContentSupplier, but the constructor consumes SheetProvider instances.
+    This is inconsistent. Perhaps add an addSheet overload that consumes a SheetProvider instance?
+    Or change this method and remove support for SheetContentSupplier in this API?
+    Perhaps split this class into a "simple" and "deluxe" version - without and with sheet names and column headers?
+    GvdNL 23-07-2022
+    */
     public void addSheet(SheetContentSupplier sheetContentSupplier) {
         addSheetToWorkbook(sheetContentSupplier);
     }

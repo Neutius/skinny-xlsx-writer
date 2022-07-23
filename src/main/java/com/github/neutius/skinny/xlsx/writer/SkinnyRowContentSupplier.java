@@ -10,6 +10,11 @@ import java.util.List;
 public class SkinnyRowContentSupplier implements RowContentSupplier {
     private final List<String> rowContent;
 
+    @Override
+    public List<String> get() {
+        return rowContent;
+    }
+
     public SkinnyRowContentSupplier() {
         rowContent = new ArrayList<>();
     }
@@ -23,12 +28,14 @@ public class SkinnyRowContentSupplier implements RowContentSupplier {
     }
 
     public void addCellContent(String content) {
-        rowContent.add(content);
+        rowContent.add(sanitizeCellContent(content));
     }
 
-    @Override
-    public List<String> get() {
-        return rowContent;
+    private static String sanitizeCellContent(String content) {
+        if (content == null || content.isBlank()) {
+            return "";
+        }
+        return content;
     }
 
 }

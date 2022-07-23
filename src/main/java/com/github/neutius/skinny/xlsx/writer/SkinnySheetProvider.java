@@ -9,15 +9,6 @@ public class SkinnySheetProvider implements SheetProvider {
 	private final SheetContentSupplier sheetContentSupplier;
 	private final String sheetName;
 
-	public SkinnySheetProvider(SheetContentSupplier sheetContentSupplier) {
-		this(sheetContentSupplier, "");
-	}
-
-	public SkinnySheetProvider(SheetContentSupplier sheetContentSupplier, String sheetName) {
-		this.sheetContentSupplier = sheetContentSupplier;
-		this.sheetName = sheetName;
-	}
-
 	@Override
 	public SheetContentSupplier getSheetContentSupplier() {
 		return sheetContentSupplier;
@@ -26,6 +17,15 @@ public class SkinnySheetProvider implements SheetProvider {
 	@Override
 	public String getSheetName() {
 		return sheetName;
+	}
+
+	public SkinnySheetProvider(SheetContentSupplier sheetContentSupplier) {
+		this(sheetContentSupplier, "");
+	}
+
+	public SkinnySheetProvider(SheetContentSupplier sheetContentSupplier, String sheetName) {
+		this.sheetContentSupplier = sheetContentSupplier;
+		this.sheetName = sheetName;
 	}
 
 }

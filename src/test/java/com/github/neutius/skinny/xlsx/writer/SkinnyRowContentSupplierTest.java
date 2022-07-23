@@ -13,6 +13,11 @@ class SkinnyRowContentSupplierTest {
     private static final String VALUE_2 = "value2";
     private static final String VALUE_3 = "value3";
 
+    private static final String EMPTY_STRING = "";
+    private static final String SPACES = "    ";
+    private static final String NEW_LINES = String.format("%n%n%n%n");
+    private static final String TABS = "\t\t\t\t";
+
     private SkinnyRowContentSupplier testSubject;
 
     @Test
@@ -46,16 +51,28 @@ class SkinnyRowContentSupplierTest {
         assertThat(rowContent).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
-    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
     void addNullValue_isReplacedWithEmptyString() {
-        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+        testSubject = new SkinnyRowContentSupplier();
+        testSubject.addCellContent(null);
+
+        List<String> rowContent = testSubject.get();
+
+        assertThat(rowContent).containsExactly(EMPTY_STRING);
+        assertThat(rowContent).doesNotContain((String) null);
     }
 
-    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
     void addBlankValues_areReplacedWithEmptyString() {
-        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+        testSubject = new SkinnyRowContentSupplier();
+        testSubject.addCellContent(SPACES);
+        testSubject.addCellContent(NEW_LINES);
+        testSubject.addCellContent(TABS);
+
+        List<String> rowContent = testSubject.get();
+
+        assertThat(rowContent).containsExactly(EMPTY_STRING, EMPTY_STRING, EMPTY_STRING);
+        assertThat(rowContent).doesNotContain(SPACES, NEW_LINES, TABS);
     }
 
     @Test

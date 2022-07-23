@@ -11,6 +11,11 @@ import java.util.List;
 public class SkinnySheetContentSupplier implements SheetContentSupplier {
     private final List<RowContentSupplier> rowContentSuppliers;
 
+    @Override
+    public List<RowContentSupplier> get() {
+        return rowContentSuppliers;
+    }
+
     public SkinnySheetContentSupplier() {
         rowContentSuppliers = new ArrayList<>();
     }
@@ -21,11 +26,6 @@ public class SkinnySheetContentSupplier implements SheetContentSupplier {
 
     public SkinnySheetContentSupplier(RowContentSupplier... initialContent) {
         this.rowContentSuppliers = Arrays.asList(initialContent);
-    }
-
-    @Override
-    public List<RowContentSupplier> get() {
-        return rowContentSuppliers;
     }
 
     public void addRowContentSupplier(RowContentSupplier rowContentSupplier) {
