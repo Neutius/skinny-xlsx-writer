@@ -13,6 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SkinnyWorkbookProviderTest {
+    private static final String VALUE_1 = "value-1";
     private static final String SHEET_NAME = "sheet name";
 
     private SkinnyWorkbookProvider testSubject;
@@ -83,7 +84,7 @@ class SkinnyWorkbookProviderTest {
 
     @Test
     void addSeveralSheetsWithNoName_sheetsHaveUniqueNames() {
-        SheetContentSupplier sameSheet = () -> List.of(() -> List.of("value-1"));
+        SheetContentSupplier sameSheet = () -> List.of(() -> List.of(VALUE_1));
         SkinnySheetProvider provider = new SkinnySheetProvider(sameSheet);
         XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(provider, provider, provider));
 
@@ -99,7 +100,7 @@ class SkinnyWorkbookProviderTest {
 
     @Test
     void addSheetWithName_sheetHasName() {
-        SheetContentSupplier contentSupplier = () -> List.of(() -> List.of("value-1"));
+        SheetContentSupplier contentSupplier = () -> List.of(() -> List.of(VALUE_1));
         SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME);
         XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
@@ -108,10 +109,20 @@ class SkinnyWorkbookProviderTest {
         assertThat(workbook.getSheetAt(0).getSheetName()).isEqualTo(SHEET_NAME);
     }
 
-    @Disabled("TODO write test -> adjust implementation if needed - GvdNL 15-07-2022")
     @Test
     void addSeveralSheetsWithTheSameName_sheetsHaveUniqueNames() {
-        // TODO write test -> adjust implementation if needed - GvdNL 15-07-2022
+        SheetContentSupplier sameSheet = () -> List.of(() -> List.of(VALUE_1));
+        SkinnySheetProvider provider = new SkinnySheetProvider(sameSheet, SHEET_NAME);
+        XlsxWorkbookProvider testSubject = new SkinnyWorkbookProvider(List.of(provider, provider, provider));
+
+        Workbook workbook = testSubject.getWorkbook();
+        String sheetName0 = workbook.getSheetAt(0).getSheetName();
+        String sheetName1 = workbook.getSheetAt(1).getSheetName();
+        String sheetName2 = workbook.getSheetAt(2).getSheetName();
+
+        assertThat(sheetName0).isNotEqualTo(sheetName1);
+        assertThat(sheetName0).isNotEqualTo(sheetName2);
+        assertThat(sheetName1).isNotEqualTo(sheetName2);
     }
 
 }

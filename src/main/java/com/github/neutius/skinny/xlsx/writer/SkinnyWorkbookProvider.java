@@ -4,6 +4,7 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -44,7 +45,21 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 
     private SXSSFSheet createSheet(String sheetName) {
         boolean hasName = sheetName != null && !(sheetName.isBlank());
-        return hasName ? workbook.createSheet(sheetName) : workbook.createSheet();
+        return hasName ? workbook.createSheet(sanitizeSheetName(sheetName)) : workbook.createSheet();
+    }
+
+    private String sanitizeSheetName(String sheetName) {
+        return isUnique(sheetName) ? sheetName : sheetName + "-" + workbook.getNumberOfSheets();
+    }
+
+    private boolean isUnique(String sheetName) {
+        for (Sheet sheet : workbook) {
+            if (sheet.getSheetName().equals(sheetName)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {

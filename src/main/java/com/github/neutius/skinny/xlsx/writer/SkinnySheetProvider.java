@@ -4,6 +4,8 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 
 public class SkinnySheetProvider implements SheetProvider {
+	// Should these fields be final?
+	// Perhaps adding a zero-argument constructor and setters would add flexibility? - GvdNL 23-07-2022
 	private final SheetContentSupplier sheetContentSupplier;
 	private final String sheetName;
 
