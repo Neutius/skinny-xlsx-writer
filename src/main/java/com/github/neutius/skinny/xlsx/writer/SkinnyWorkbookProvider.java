@@ -4,6 +4,7 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -15,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
-    private final SXSSFWorkbook workbook;
+    private final SXSSFWorkbook workbook = new SXSSFWorkbook();
 
     @Override
     public SXSSFWorkbook getWorkbook() {
@@ -23,11 +24,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     }
 
     public SkinnyWorkbookProvider() {
-        workbook = new SXSSFWorkbook();
     }
 
     public SkinnyWorkbookProvider(Collection<SheetProvider> sheetProviders) {
-        workbook = new SXSSFWorkbook();
         sheetProviders.forEach(this::addSheetToWorkbook);
     }
 
@@ -44,12 +43,12 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 
     private void addSheetToWorkbook(SheetProvider sheetProvider) {
         SXSSFSheet sheet = createSheet(sheetProvider.getSheetName());
-        sheetProvider.getSheetContentSupplier().get().forEach(row -> addRowToSheet(row, sheet));
+        fillSheet(sheetProvider.getSheetContentSupplier(), sheet);
     }
 
     private void addSheetToWorkbook(SheetContentSupplier sheetContentSupplier) {
         SXSSFSheet sheet = createSheet("");
-        sheetContentSupplier.get().forEach(row -> addRowToSheet(row, sheet));
+        fillSheet(sheetContentSupplier, sheet);
     }
 
     private SXSSFSheet createSheet(String sheetName) {
@@ -67,14 +66,44 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         return !sheetNamesInWorkbook.contains(sheetName);
     }
 
-    private void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
-        SXSSFRow row = sheet.createRow(sheet.getPhysicalNumberOfRows());
-        rowContent.get().forEach(cell -> addCellToRow(cell, row));
+    private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
+        sheetContentSupplier.get().forEach(row -> addRowToSheet(row, sheet));
+        if (sheet.getPhysicalNumberOfRows() < 100) {
+            autoSizeColumns(sheet);
+        }
     }
 
-    private void addCellToRow(String cellContent, SXSSFRow row) {
+    private static void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
+        SXSSFRow row = sheet.createRow(sheet.getPhysicalNumberOfRows());
+        rowContent.get().forEach(cell -> addCellToRow(cell, row));
+        if (sheet.getPhysicalNumberOfRows() == 100) {
+            autoSizeColumns(sheet);
+        }
+    }
+
+    private static void addCellToRow(String cellContent, SXSSFRow row) {
         SXSSFCell cell = row.createCell(row.getPhysicalNumberOfCells());
         cell.setCellValue(cellContent);
+    }
+
+    private static void autoSizeColumns(SXSSFSheet sheet) {
+        sheet.trackAllColumnsForAutoSizing();
+        autoSizeColumns(sheet, getCurrentAmountOfColumns(sheet));
+        sheet.untrackAllColumnsForAutoSizing();
+    }
+
+    private static int getCurrentAmountOfColumns(Sheet sheet) {
+        int columnAmount = 0;
+        for (Row row : sheet) {
+            columnAmount = Math.max(row.getPhysicalNumberOfCells(), columnAmount);
+        }
+        return columnAmount;
+    }
+
+    private static void autoSizeColumns(Sheet sheet, int columnAmount) {
+        for (int index = 0; index < columnAmount; index++) {
+            sheet.autoSizeColumn(index);
+        }
     }
 
 }
