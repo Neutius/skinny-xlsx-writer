@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
@@ -13,6 +13,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
@@ -30,25 +31,14 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         sheetProviders.forEach(this::addSheetToWorkbook);
     }
 
-    /*
-    The separate "addSheet" method consumes a SheetContentSupplier, but the constructor consumes SheetProvider instances.
-    This is inconsistent. Perhaps add an addSheet overload that consumes a SheetProvider instance?
-    Or change this method and remove support for SheetContentSupplier in this API?
-    Perhaps split this class into a "simple" and "deluxe" version - without and with sheet names and column headers?
-    GvdNL 23-07-2022
-    */
-    public void addSheet(SheetContentSupplier sheetContentSupplier) {
-        addSheetToWorkbook(sheetContentSupplier);
+    public void addSheet(SheetProvider sheetProvider) {
+        addSheetToWorkbook(sheetProvider);
     }
 
     private void addSheetToWorkbook(SheetProvider sheetProvider) {
         SXSSFSheet sheet = createSheet(sheetProvider.getSheetName());
+        addColumnHeaders(sheetProvider, sheet);
         fillSheet(sheetProvider.getSheetContentSupplier(), sheet);
-    }
-
-    private void addSheetToWorkbook(SheetContentSupplier sheetContentSupplier) {
-        SXSSFSheet sheet = createSheet("");
-        fillSheet(sheetContentSupplier, sheet);
     }
 
     private SXSSFSheet createSheet(String sheetName) {
@@ -66,16 +56,26 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         return !sheetNamesInWorkbook.contains(sheetName);
     }
 
+    private static void addColumnHeaders(SheetProvider sheetProvider, SXSSFSheet sheet) {
+        if (columnHeadersAreProvided(sheetProvider.getColumnHeaderSupplier())) {
+            addRowToSheet(sheetProvider.getColumnHeaderSupplier().get(), sheet);
+        }
+    }
+
+    private static boolean columnHeadersAreProvided(ColumnHeaderSupplier columnHeaderSupplier) {
+        return columnHeaderSupplier != null && columnHeaderSupplier.get() != null && !(columnHeaderSupplier.get().isEmpty());
+    }
+
     private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
-        sheetContentSupplier.get().forEach(row -> addRowToSheet(row, sheet));
+        sheetContentSupplier.get().forEach(row -> addRowToSheet(row.get(), sheet));
         if (sheet.getPhysicalNumberOfRows() < 100) {
             autoSizeColumns(sheet);
         }
     }
 
-    private static void addRowToSheet(ContentRowSupplier contentRow, SXSSFSheet sheet) {
+    private static void addRowToSheet(List<String> cellValues, SXSSFSheet sheet) {
         SXSSFRow row = sheet.createRow(sheet.getPhysicalNumberOfRows());
-        contentRow.get().forEach(cell -> addCellToRow(cell, row));
+        cellValues.forEach(cell -> addCellToRow(cell, row));
         if (sheet.getPhysicalNumberOfRows() == 100) {
             autoSizeColumns(sheet);
         }
@@ -88,7 +88,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 
     private static void autoSizeColumns(SXSSFSheet sheet) {
         sheet.trackAllColumnsForAutoSizing();
-        autoSizeColumns(sheet, getCurrentAmountOfColumns(sheet));
+        for (int index = 0; index < getCurrentAmountOfColumns(sheet); index++) {
+            sheet.autoSizeColumn(index);
+        }
         sheet.untrackAllColumnsForAutoSizing();
     }
 
@@ -98,12 +100,6 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
             columnAmount = Math.max(row.getPhysicalNumberOfCells(), columnAmount);
         }
         return columnAmount;
-    }
-
-    private static void autoSizeColumns(Sheet sheet, int columnAmount) {
-        for (int index = 0; index < columnAmount; index++) {
-            sheet.autoSizeColumn(index);
-        }
     }
 
 }

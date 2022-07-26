@@ -44,7 +44,7 @@ class SkinnyWorkbookProviderTest {
         SkinnySheetContentSupplier sheetContentSupplier = new SkinnySheetContentSupplier();
         sheetContentSupplier.addContentRow("value1");
 
-        testSubject.addSheet(sheetContentSupplier);
+        testSubject.addSheet(new SkinnySheetProvider(sheetContentSupplier));
         Workbook workbook = testSubject.getWorkbook();
 
         assertThat(workbook).isNotEmpty();
@@ -60,7 +60,7 @@ class SkinnyWorkbookProviderTest {
         sheetContentSupplier.addContentRow("0-2-0", "0-2-1", "0-2-2", "0-2-3");
         sheetContentSupplier.addContentRow("0-3-0", "0-3-1", "0-3-2", "0-3-3");
 
-        testSubject.addSheet(sheetContentSupplier);
+        testSubject.addSheet(new SkinnySheetProvider(sheetContentSupplier));
         Workbook workbook = testSubject.getWorkbook();
 
         assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("0-0-0");
@@ -86,12 +86,12 @@ class SkinnyWorkbookProviderTest {
 
     @Test
     void useLambdasForSingleValue_valueIsPresent() {
-        SkinnySheetProvider provider = new SkinnySheetProvider(() -> List.of(() -> List.of("value-1")));
+        SkinnySheetProvider provider = new SkinnySheetProvider(() -> List.of(() -> List.of(VALUE_1)));
         testSubject = new SkinnyWorkbookProvider(List.of(provider));
 
         Workbook workbook = testSubject.getWorkbook();
 
-        assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("value-1");
+        assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
     }
 
     @Test
