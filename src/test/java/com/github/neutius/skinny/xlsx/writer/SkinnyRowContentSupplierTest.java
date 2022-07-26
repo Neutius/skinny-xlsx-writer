@@ -38,7 +38,7 @@ class SkinnyRowContentSupplierTest {
 
         List<String> rowContent = testSubject.get();
 
-        assertThat(rowContent).contains(VALUE_1);
+        assertThat(rowContent).containsExactly(VALUE_1);
     }
 
     @Test
@@ -97,7 +97,7 @@ class SkinnyRowContentSupplierTest {
     }
 
     @Test
-    void createInstanceWithNullCollection_areReplacedWithEmptyList() {
+    void createInstanceWithNullCollection_isReplacedWithEmptyList() {
         testSubject = new SkinnyRowContentSupplier((Set<String>) null);
 
         List<String> rowContent = testSubject.get();
