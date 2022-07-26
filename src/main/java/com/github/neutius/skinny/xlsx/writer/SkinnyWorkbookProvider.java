@@ -4,12 +4,17 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -59,7 +64,28 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     private static void addColumnHeaders(SheetProvider sheetProvider, SXSSFSheet sheet) {
         if (columnHeadersAreProvided(sheetProvider.getColumnHeaderSupplier())) {
             addRowToSheet(sheetProvider.getColumnHeaderSupplier().get(), sheet);
+            applyColumnHeaderFormattingToFirstRow(sheet);
         }
+    }
+
+    private static void applyColumnHeaderFormattingToFirstRow(SXSSFSheet sheet) {
+        CellStyle columnHeaderCellStyle = createColumnHeaderCellStyle(sheet.getWorkbook());
+        for (Cell cell : sheet.getRow(0)) {
+            cell.setCellStyle(columnHeaderCellStyle);
+        }
+    }
+
+    private static CellStyle createColumnHeaderCellStyle(SXSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(getBoldFont(workbook));
+        style.setWrapText(false);
+        return style;
+    }
+
+    private static Font getBoldFont(SXSSFWorkbook workbook) {
+        Font boldFont = workbook.createFont();
+        boldFont.setBold(true);
+        return boldFont;
     }
 
     private static boolean columnHeadersAreProvided(ColumnHeaderSupplier columnHeaderSupplier) {

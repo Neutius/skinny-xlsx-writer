@@ -4,6 +4,10 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -79,16 +83,44 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
 	}
 
+	@Test
+	void addColumnHeader_fontIsBold() {
+		ColumnHeaderSupplier headerSupplier = () -> List.of(HEADER_1);
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook actualWorkbook = testSubject.getWorkbook();
+
+		SXSSFCell cell = actualWorkbook.getSheetAt(0).getRow(0).getCell(0);
+		XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
+		XSSFFont font = cellStyle.getFont();
+		assertThat(font).isNotNull();
+		assertThat(font.getBold()).isTrue();
+	}
+
+	@Test
+	void addColumnHeaderAndContentRow_contentRowFontIsNotBold() {
+		ColumnHeaderSupplier headerSupplier = () -> List.of(HEADER_1);
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook actualWorkbook = testSubject.getWorkbook();
+
+		SXSSFCell cell = actualWorkbook.getSheetAt(0).getRow(1).getCell(0);
+		XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
+		XSSFFont font = cellStyle.getFont();
+		assertThat(font).isNotNull();
+		assertThat(font.getBold()).isFalse();
+	}
+
 
 
 	/*
 	TODO add tests and functionality - GvdNL 26-07-2022
 
-	- addColumnHeader_fontIsBold
 	- addColumnHeader_freezePaneIsApplied
 	- addColumnHeader_filterIsApplied
 
-	- addColumnHeaderAndContentRow_contentRowFontIsNotBold
 	- addColumnHeaderAndContentRow_contentRowHasNoFreezePane
 	- addColumnHeaderAndContentRow_contentRowHasNoFilter
 
