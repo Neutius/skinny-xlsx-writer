@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SkinnyWorkbookProviderColumnHeaderTest {
 	private static final String HEADER_1 = "Header-1";
 	private static final String VALUE_1 = "value-1";
+	private static final SheetContentSupplier CONTENT_SUPPLIER = () -> List.of(() -> List.of(VALUE_1));
 	private static final String SHEET_NAME = "sheet name";
 
 	private SkinnyWorkbookProvider testSubject;
@@ -21,8 +22,7 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 	@Test
 	void addColumnHeader_isPresent() {
 		ColumnHeaderSupplier headerSupplier = () -> List.of(HEADER_1);
-		SheetContentSupplier contentSupplier = () -> List.of(Collections::emptyList);
-		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME, headerSupplier);
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
 		Workbook workbook = testSubject.getWorkbook();
@@ -33,22 +33,56 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 	@Test
 	void addColumnHeaderAndContentRow_bothArePresent() {
 		ColumnHeaderSupplier headerSupplier = () -> List.of(HEADER_1);
-		SheetContentSupplier contentSupplier = () -> List.of(() -> List.of(VALUE_1));
-		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME, headerSupplier);
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
 		Workbook workbook = testSubject.getWorkbook();
 
+		assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows()).isEqualTo(2);
 		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(HEADER_1);
 		assertThat(workbook.getSheetAt(0).getRow(1).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
+	}
+
+	@Test
+	void columnHeaderSupplierReturnsEmptyList_noColumnHeadersAdded() {
+		ColumnHeaderSupplier headerSupplier = () -> Collections.emptyList();
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows()).isEqualTo(1);
+		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
+	}
+
+	@Test
+	void columnHeaderSupplierReturnsNull_noColumnHeadersAdded() {
+		ColumnHeaderSupplier headerSupplier = () -> null;
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows()).isEqualTo(1);
+		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
+	}
+
+	@Test
+	void columnHeaderSupplierIsNull_noColumnHeadersAdded() {
+		ColumnHeaderSupplier headerSupplier = null;
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows()).isEqualTo(1);
+		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
 	}
 
 
 
 	/*
 	TODO add tests and functionality - GvdNL 26-07-2022
-
-	- handling of null values
 
 	- addColumnHeader_fontIsBold
 	- addColumnHeader_freezePaneIsApplied
