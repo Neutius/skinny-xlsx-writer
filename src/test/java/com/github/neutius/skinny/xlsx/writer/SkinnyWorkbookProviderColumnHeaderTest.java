@@ -90,9 +90,9 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
-		SXSSFWorkbook actualWorkbook = testSubject.getWorkbook();
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
 
-		SXSSFCell cell = actualWorkbook.getSheetAt(0).getRow(0).getCell(0);
+		SXSSFCell cell = workbook.getSheetAt(0).getRow(0).getCell(0);
 		XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
 		XSSFFont font = cellStyle.getFont();
 		assertThat(font).isNotNull();
@@ -105,9 +105,9 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
-		SXSSFWorkbook actualWorkbook = testSubject.getWorkbook();
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
 
-		SXSSFCell cell = actualWorkbook.getSheetAt(0).getRow(1).getCell(0);
+		SXSSFCell cell = workbook.getSheetAt(0).getRow(1).getCell(0);
 		XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
 		XSSFFont font = cellStyle.getFont();
 		assertThat(font).isNotNull();
@@ -120,9 +120,9 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
 
-		SXSSFWorkbook actualWorkbook = testSubject.getWorkbook();
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
 
-		PaneInformation paneInformation = actualWorkbook.getSheetAt(0).getPaneInformation();
+		PaneInformation paneInformation = workbook.getSheetAt(0).getPaneInformation();
 		assertThat(paneInformation).isNotNull();
 		assertThat(paneInformation.isFreezePane()).isTrue();
 		assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
