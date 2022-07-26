@@ -1,5 +1,26 @@
 # Software Component: Skinny .xlsx Writer
 
+
+
+## Glossary
+
+The terms "-Supplier" and "-Provider" are both used, e.g. in names of interfaces and classes. These are not used interchangeably:
+- Any "-Supplier" interface extends the functional interface java.util.function.Supplier.
+  - All of these interfaces can be implemented by a client-side lambda expression, if so desired.
+  - Alternatively, client-side developers can write and use their own implementations.
+- Any "-Supplier" class implements the functional interface java.util.function.Supplier (directly or indirectly).
+  - These classes are designed to be simple default implementations, and should generally not be consumed by any public API.
+
+
+A sheet can contain a single column header row, followed by an unlimited amount of content rows.
+- Both types are rows with content. Column header rows are distinct from content rows. 
+  - Therefore, content rows are called "content row", and the term "row content" is avoided.
+- The terms "column header", "column headers" and "column header row" are used more or less interchangeably
+
+
+
+## ---- Original README below this point ----
+
 ## Description
 The Skinny .xlsx Writer allows you to write in memory data to a .xlsx file with as little effort as possible. Options are limited 
 to instantiating a single in memory workbook, adding sheets to the workbook, adding column headers and/or content rows to a sheet, 
