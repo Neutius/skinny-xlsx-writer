@@ -25,8 +25,8 @@ import java.util.function.Supplier;
  */
 
 
-public interface SheetContentSupplier extends Supplier<List<RowContentSupplier>> {
+public interface SheetContentSupplier extends Supplier<List<ContentRowSupplier>> {
 
-	List<RowContentSupplier> get();
+	List<ContentRowSupplier> get();
 
 }

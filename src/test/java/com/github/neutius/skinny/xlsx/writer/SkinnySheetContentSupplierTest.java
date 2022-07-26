@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -23,142 +23,142 @@ class SkinnySheetContentSupplierTest {
     void createInstance_resultIsEmpty() {
         testSubject = new SkinnySheetContentSupplier();
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers).isNotNull().isEmpty();
     }
 
     @Test
-    void addRowContentSupplier_inputIsIncluded() {
+    void addContentRowSupplier_inputIsIncluded() {
         testSubject = new SkinnySheetContentSupplier();
-        SkinnyRowContentSupplier rowContentSupplier = new SkinnyRowContentSupplier();
-        testSubject.addRowContentSupplier(rowContentSupplier);
+        SkinnyContentRowSupplier contentRowSupplier = new SkinnyContentRowSupplier();
+        testSubject.addContentRowSupplier(contentRowSupplier);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers).contains(rowContentSupplier);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers).contains(contentRowSupplier);
     }
 
     @Test
-    void addRowContentWithSupplier_sameValuesAreReturned() {
+    void addContentRowWithSupplier_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
-        testSubject.addRowContentSupplier(new SkinnyRowContentSupplier(VALUE_1, VALUE_2, VALUE_3));
+        testSubject.addContentRowSupplier(new SkinnyContentRowSupplier(VALUE_1, VALUE_2, VALUE_3));
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
-    void addNullValueForRowContentSupplier_isReplacedWithEmptyList() {
+    void addNullValueForContentRowSupplier_isReplacedWithEmptyList() {
         testSubject = new SkinnySheetContentSupplier();
-        testSubject.addRowContentSupplier(null);
+        testSubject.addContentRowSupplier(null);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).doesNotContain((RowContentSupplier) null);
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers).doesNotContain((ContentRowSupplier) null);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).isNotNull().isEmpty();
     }
 
     @Test
-    void addRowContentAsCollection_sameValuesAreReturned() {
+    void addContentRowAsCollection_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(Set.of(VALUE_1, VALUE_2, VALUE_3));
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactlyInAnyOrder(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
-    void addRowContentAsNullCollection_isReplacedWithEmptyList() {
+    void addContentRowAsNullCollection_isReplacedWithEmptyList() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow((Set<String>) null);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).doesNotContain((RowContentSupplier) null);
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers).doesNotContain((ContentRowSupplier) null);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).isNotNull().isEmpty();
     }
 
     @Test
-    void addRowContentAsVarArgs_sameValuesAreReturned() {
+    void addContentRowAsVarArgs_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(VALUE_1, VALUE_2, VALUE_3);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
     }
 
     @Test
-    void addRowContentAsNullVarArgs_resultContainsEmptyStrings() {
+    void addContentRowAsNullVarArgs_resultContainsEmptyStrings() {
         testSubject = new SkinnySheetContentSupplier();
         testSubject.addContentRow(null, null, null);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(1);
-        assertThat(rowContentSuppliers.get(0).get()).doesNotContain(VALUE_1, VALUE_2, VALUE_3);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactly("", "", "");
+        assertThat(contentRowSuppliers).hasSize(1);
+        assertThat(contentRowSuppliers.get(0).get()).doesNotContain(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactly("", "", "");
     }
 
     @Test
-    void createInstanceWithRowContentAsCollection_sameValuesAreReturned() {
+    void createInstanceWithContentRowAsCollection_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier(List.of(
                 () -> List.of(VALUE_1, VALUE_2, VALUE_3),
                 () -> List.of(VALUE_4, VALUE_5, VALUE_6)));
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(2);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
-        assertThat(rowContentSuppliers.get(1).get()).containsExactly(VALUE_4, VALUE_5, VALUE_6);
+        assertThat(contentRowSuppliers).hasSize(2);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers.get(1).get()).containsExactly(VALUE_4, VALUE_5, VALUE_6);
     }
 
     @Test
-    void createInstanceWithRowContentAsCollectionContainingNull_nullReplacedWithEmptyList() {
+    void createInstanceWithContentRowAsCollectionContainingNull_nullReplacedWithEmptyList() {
         testSubject = new SkinnySheetContentSupplier(Arrays.asList(
                 () -> null,
                 null));
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(2);
-        assertThat(rowContentSuppliers.get(0).get()).isNotNull().isEmpty();
-        assertThat(rowContentSuppliers.get(1).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers).hasSize(2);
+        assertThat(contentRowSuppliers.get(0).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers.get(1).get()).isNotNull().isEmpty();
     }
 
     @Test
-    void createInstanceWithRowContentAsVarArgs_sameValuesAreReturned() {
+    void createInstanceWithContentRowAsVarArgs_sameValuesAreReturned() {
         testSubject = new SkinnySheetContentSupplier(
                 () -> List.of(VALUE_1, VALUE_2, VALUE_3),
                 () -> List.of(VALUE_4, VALUE_5, VALUE_6));
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(2);
-        assertThat(rowContentSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
-        assertThat(rowContentSuppliers.get(1).get()).containsExactly(VALUE_4, VALUE_5, VALUE_6);
+        assertThat(contentRowSuppliers).hasSize(2);
+        assertThat(contentRowSuppliers.get(0).get()).containsExactly(VALUE_1, VALUE_2, VALUE_3);
+        assertThat(contentRowSuppliers.get(1).get()).containsExactly(VALUE_4, VALUE_5, VALUE_6);
     }
 
     @Test
-    void createInstanceWithRowContentAsVarArgsContainingNull_nullReplacedWithEmptyList() {
+    void createInstanceWithContentRowAsVarArgsContainingNull_nullReplacedWithEmptyList() {
         testSubject = new SkinnySheetContentSupplier(
                 () -> null,
                 null);
 
-        List<RowContentSupplier> rowContentSuppliers = testSubject.get();
+        List<ContentRowSupplier> contentRowSuppliers = testSubject.get();
 
-        assertThat(rowContentSuppliers).hasSize(2);
-        assertThat(rowContentSuppliers.get(0).get()).isNotNull().isEmpty();
-        assertThat(rowContentSuppliers.get(1).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers).hasSize(2);
+        assertThat(contentRowSuppliers.get(0).get()).isNotNull().isEmpty();
+        assertThat(contentRowSuppliers.get(1).get()).isNotNull().isEmpty();
     }
 
 }

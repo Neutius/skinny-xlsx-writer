@@ -8,7 +8,7 @@ import java.util.function.Supplier;
  Perhaps it's better to use this as an empty marker interface, with JavaDoc? - GvdNL 15-07-2022
  */
 
-public interface RowContentSupplier extends Supplier<List<String>> {
+public interface ContentRowSupplier extends Supplier<List<String>> {
 
     List<String> get();
 

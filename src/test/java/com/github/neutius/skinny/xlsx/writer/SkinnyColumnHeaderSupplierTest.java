@@ -23,7 +23,7 @@ class SkinnyColumnHeaderSupplierTest {
 	private SkinnyColumnHeaderSupplier testSubject;
 
 	@Test
-	void createInstance_rowContentIsEmpty() {
+	void createInstance_rowIsEmpty() {
 		testSubject = new SkinnyColumnHeaderSupplier();
 
 		List<String> columnHeaders = testSubject.get();

@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
@@ -73,9 +73,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         }
     }
 
-    private static void addRowToSheet(RowContentSupplier rowContent, SXSSFSheet sheet) {
+    private static void addRowToSheet(ContentRowSupplier contentRow, SXSSFSheet sheet) {
         SXSSFRow row = sheet.createRow(sheet.getPhysicalNumberOfRows());
-        rowContent.get().forEach(cell -> addCellToRow(cell, row));
+        contentRow.get().forEach(cell -> addCellToRow(cell, row));
         if (sheet.getPhysicalNumberOfRows() == 100) {
             autoSizeColumns(sheet);
         }

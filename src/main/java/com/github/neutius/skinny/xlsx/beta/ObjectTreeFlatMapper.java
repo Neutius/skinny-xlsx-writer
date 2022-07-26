@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.beta;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,10 +10,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ObjectTreeFlatMapper<T> implements RowContentSupplier {
+public class ObjectTreeFlatMapper<T> implements ContentRowSupplier {
     public static final int DEFAULT_DEPTH = 0;
 
-    private final ArrayList<String> rowContent;
+    private final ArrayList<String> contentRow;
     private final T sourceObject;
 
     public ObjectTreeFlatMapper(T sourceObject) {
@@ -22,7 +22,7 @@ public class ObjectTreeFlatMapper<T> implements RowContentSupplier {
 
     public ObjectTreeFlatMapper(T sourceObject, int depth) {
         this.sourceObject = sourceObject;
-        rowContent = new ArrayList<>();
+        contentRow = new ArrayList<>();
         convertObjectToStringList(depth);
     }
 
@@ -31,7 +31,7 @@ public class ObjectTreeFlatMapper<T> implements RowContentSupplier {
 
         allGetMethods.sort(Comparator.comparing(Method::getName));
 
-        allGetMethods.forEach(method -> rowContent.add(getStringValueFromGetMethod(method)));
+        allGetMethods.forEach(method -> contentRow.add(getStringValueFromGetMethod(method)));
     }
 
     private String getStringValueFromGetMethod(Method method) {
@@ -76,6 +76,6 @@ public class ObjectTreeFlatMapper<T> implements RowContentSupplier {
 
     @Override
     public List<String> get() {
-        return rowContent;
+        return contentRow;
     }
 }

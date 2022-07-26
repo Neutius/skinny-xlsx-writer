@@ -1,30 +1,30 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class SkinnyRowContentSupplier implements RowContentSupplier {
-    private final List<String> rowContent = new ArrayList<>();
+public class SkinnyContentRowSupplier implements ContentRowSupplier {
+    private final List<String> contentRow = new ArrayList<>();
 
     @Override
     public List<String> get() {
-        return rowContent;
+        return contentRow;
     }
 
-    public SkinnyRowContentSupplier() {
+    public SkinnyContentRowSupplier() {
     }
 
-    public SkinnyRowContentSupplier(Collection<String> initialContent) {
+    public SkinnyContentRowSupplier(Collection<String> initialContent) {
         if (initialContent != null) {
             initialContent.forEach(this::addCellContentToRow);
         }
     }
 
-    public SkinnyRowContentSupplier(String... initialContent) {
+    public SkinnyContentRowSupplier(String... initialContent) {
         Arrays.asList(initialContent).forEach(this::addCellContentToRow);
     }
 
@@ -33,7 +33,7 @@ public class SkinnyRowContentSupplier implements RowContentSupplier {
     }
 
     private void addCellContentToRow(String content) {
-        rowContent.add(sanitizeCellContent(content));
+        contentRow.add(sanitizeCellContent(content));
     }
 
     private static String sanitizeCellContent(String content) {

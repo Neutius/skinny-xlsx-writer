@@ -1,9 +1,8 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.RowContentSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
-import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -152,12 +151,12 @@ class SkinnyWorkbookProviderTest {
 
     @Test
     void cellValuesHaveDifferentWidthOnlyAfter100Rows_sheetColumnsHaveSameWidth() {
-        List<RowContentSupplier> rowContentSupplierList = new ArrayList<>();
+        List<ContentRowSupplier> contentRowSupplierList = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
-            rowContentSupplierList.add(Collections::emptyList);
+            contentRowSupplierList.add(Collections::emptyList);
         }
-        rowContentSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
-        testSubject = new SkinnyWorkbookProvider(List.of(new SkinnySheetProvider(() -> rowContentSupplierList, SHEET_NAME)));
+        contentRowSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
+        testSubject = new SkinnyWorkbookProvider(List.of(new SkinnySheetProvider(() -> contentRowSupplierList, SHEET_NAME)));
 
         Workbook workbook = testSubject.getWorkbook();
         Sheet actualSheet = workbook.getSheetAt(0);
@@ -168,13 +167,13 @@ class SkinnyWorkbookProviderTest {
 
     @Test
     void cellValuesHaveDifferentWidthOnlyAfter99Rows_sheetColumnsHaveDifferentWidth() {
-        List<RowContentSupplier> rowContentSupplierList = new ArrayList<>();
+        List<ContentRowSupplier> contentRowSupplierList = new ArrayList<>();
         for (int i = 1; i <= 99; i++) {
-            rowContentSupplierList.add(Collections::emptyList);
+            contentRowSupplierList.add(Collections::emptyList);
         }
-        rowContentSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
-        rowContentSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
-        testSubject = new SkinnyWorkbookProvider(List.of(new SkinnySheetProvider(() -> rowContentSupplierList, SHEET_NAME)));
+        contentRowSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
+        contentRowSupplierList.add(() -> List.of("short", "medium sized", "relatively large piece of text"));
+        testSubject = new SkinnyWorkbookProvider(List.of(new SkinnySheetProvider(() -> contentRowSupplierList, SHEET_NAME)));
 
         Workbook workbook = testSubject.getWorkbook();
         Sheet actualSheet = workbook.getSheetAt(0);
