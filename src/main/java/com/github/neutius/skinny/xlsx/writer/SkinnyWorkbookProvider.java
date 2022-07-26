@@ -65,6 +65,7 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
         if (columnHeadersAreProvided(sheetProvider.getColumnHeaderSupplier())) {
             addRowToSheet(sheetProvider.getColumnHeaderSupplier().get(), sheet);
             applyColumnHeaderFormattingToFirstRow(sheet);
+            sheet.createFreezePane(0, 1);
         }
     }
 
