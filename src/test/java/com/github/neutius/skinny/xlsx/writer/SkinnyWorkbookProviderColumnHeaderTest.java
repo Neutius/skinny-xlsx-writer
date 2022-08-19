@@ -3,9 +3,12 @@ package com.github.neutius.skinny.xlsx.writer;
 import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
+import org.apache.poi.ss.usermodel.AutoFilter;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -115,6 +118,21 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 	}
 
 	@Test
+	void noColumnHeader_firstRowFontIsNotBold() {
+		ColumnHeaderSupplier headerSupplier = () -> null;
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
+
+		SXSSFCell cell = workbook.getSheetAt(0).getRow(0).getCell(0);
+		XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle();
+		XSSFFont font = cellStyle.getFont();
+		assertThat(font).isNotNull();
+		assertThat(font.getBold()).isFalse();
+	}
+
+	@Test
 	void addColumnHeader_freezePaneIsApplied() {
 		ColumnHeaderSupplier headerSupplier = () -> List.of(HEADER_1);
 		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
@@ -129,17 +147,24 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
 	}
 
+	@Test
+	void noColumnHeader_freezePaneIsNotApplied() {
+		ColumnHeaderSupplier headerSupplier = () -> null;
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
+
+		PaneInformation paneInformation = workbook.getSheetAt(0).getPaneInformation();
+		assertThat(paneInformation).isNull();
+	}
+
 
 	/*
 	TODO add tests and functionality - GvdNL 26-07-2022
-
-	- addColumnHeader_filterIsApplied
-
-	- addColumnHeaderAndContentRow_contentRowHasNoFilter
-
-	- configuration options for bold font, freeze pane and filter?
-
 	- columnHeadersHaveDifferentWidth_sheetColumnsHaveDifferentWidth
+	
+	- configuration options for bold font, freeze pane and filter?
 
 	Maybe here or somewhere else?
 	- cellValuesHaveDifferentWidthOnlyAfter99ContentRows_sheetColumnsHaveSameWidth

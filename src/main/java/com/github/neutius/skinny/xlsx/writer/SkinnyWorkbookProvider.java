@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -62,10 +63,12 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     }
 
     private static void addColumnHeaders(SheetProvider sheetProvider, SXSSFSheet sheet) {
-        if (columnHeadersAreProvided(sheetProvider.getColumnHeaderSupplier())) {
-            addRowToSheet(sheetProvider.getColumnHeaderSupplier().get(), sheet);
+        ColumnHeaderSupplier headerSupplier = sheetProvider.getColumnHeaderSupplier();
+        if (columnHeadersAreProvided(headerSupplier)) {
+            addRowToSheet(headerSupplier.get(), sheet);
             applyColumnHeaderFormattingToFirstRow(sheet);
             sheet.createFreezePane(0, 1);
+            sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, headerSupplier.get().size() -1));
         }
     }
 
