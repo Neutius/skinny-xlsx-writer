@@ -3,12 +3,10 @@ package com.github.neutius.skinny.xlsx.writer;
 import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
-import org.apache.poi.ss.usermodel.AutoFilter;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.PaneInformation;
 import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -159,11 +157,49 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 		assertThat(paneInformation).isNull();
 	}
 
+	@Test
+	void columnHeadersHaveSameWidth_sheetColumnsHaveSameWidth() {
+		ColumnHeaderSupplier headerSupplier = () -> List.of(
+				"Same width",
+				"Same width",
+				"Same width");
+		SheetContentSupplier contentSupplier = () -> List.of(() -> List.of(
+				"short",
+				"short",
+				"short"));
+		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
+		Sheet actualSheet = workbook.getSheetAt(0);
+
+		assertThat(actualSheet.getColumnWidth(0)).isEqualTo(actualSheet.getColumnWidth(1));
+		assertThat(actualSheet.getColumnWidth(1)).isEqualTo(actualSheet.getColumnWidth(2));
+	}
+
+	@Test
+	void columnHeadersHaveDifferentWidth_sheetColumnsHaveDifferentWidth() {
+		ColumnHeaderSupplier headerSupplier = () -> List.of(
+				"short",
+				"Same width",
+				"Relatively long column header text");
+		SheetContentSupplier contentSupplier = () -> List.of(() -> List.of(
+				"short",
+				"short",
+				"short"));
+		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		SXSSFWorkbook workbook = testSubject.getWorkbook();
+		Sheet actualSheet = workbook.getSheetAt(0);
+
+		assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
+		assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
+	}
+
 
 	/*
 	TODO add tests and functionality - GvdNL 26-07-2022
-	- columnHeadersHaveDifferentWidth_sheetColumnsHaveDifferentWidth
-	
 	- configuration options for bold font, freeze pane and filter?
 
 	Maybe here or somewhere else?
