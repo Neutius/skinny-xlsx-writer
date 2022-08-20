@@ -1,5 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
@@ -118,7 +119,7 @@ class SkinnyWorkbookProviderTest {
 	}
 
 	@Test
-	void columnHeadersContainNullAndBlankValues_replacedWithEmptyStrings() {
+	void contentRowContainNullAndBlankValues_replacedWithEmptyStrings() {
 		SheetContentSupplier contentSupplier = () -> List.of(() ->
 				Arrays.asList(VALUE_1, NULL_VALUE, EMPTY_STRING, SPACES, TABS, NEW_LINES, VALUE_1));
 		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME);
@@ -241,6 +242,65 @@ class SkinnyWorkbookProviderTest {
 
 		assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
 		assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
+	}
+
+	@Test
+	void addSheetsWithNullValues_sheetsHaveNamesAndNoContent() {
+		SheetProvider sheet1 = new TestSheet(null, null, null);
+		SheetProvider sheet2 = new TestSheet(null, () -> null, () -> null);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheet1, sheet2));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook).hasSize(2);
+		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(0)).hasSize(0);
+		assertThat(workbook.getSheetAt(1).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(1)).hasSize(0);
+	}
+
+	@Test
+	void addSheetsWithEmptyAndBlankNames_sheetsHaveNames() {
+		SheetProvider sheet1 = new TestSheet(EMPTY_STRING, null, null);
+		SheetProvider sheet2 = new TestSheet(SPACES, null, null);
+		SheetProvider sheet3 = new TestSheet(TABS, null, null);
+		SheetProvider sheet4 = new TestSheet(NEW_LINES, null, null);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheet1, sheet2, sheet3, sheet4));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(1).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(2).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(3).getSheetName()).isNotNull().isNotBlank();
+	}
+
+	private static class TestSheet implements SheetProvider {
+		private final String sheetName;
+		private final ColumnHeaderSupplier columnHeaderSupplier;
+		private final SheetContentSupplier sheetContentSupplier;
+
+		public TestSheet(String sheetName, ColumnHeaderSupplier columnHeaderSupplier,
+						 SheetContentSupplier sheetContentSupplier) {
+			this.sheetName = sheetName;
+			this.columnHeaderSupplier = columnHeaderSupplier;
+			this.sheetContentSupplier = sheetContentSupplier;
+		}
+
+		@Override
+		public String getSheetName() {
+			return sheetName;
+		}
+
+		@Override
+		public ColumnHeaderSupplier getColumnHeaderSupplier() {
+			return columnHeaderSupplier;
+		}
+
+		@Override
+		public SheetContentSupplier getSheetContentSupplier() {
+			return sheetContentSupplier;
+		}
 	}
 
 }

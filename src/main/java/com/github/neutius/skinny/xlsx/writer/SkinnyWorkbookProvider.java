@@ -97,6 +97,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 	}
 
 	private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
+		if (sheetContentSupplier == null || sheetContentSupplier.get() == null) {
+			return;
+		}
 		sheetContentSupplier.get().forEach(row -> addRowToSheet(sanitizeRow(row).get(), sheet));
 		if (sheet.getPhysicalNumberOfRows() < 100) {
 			autoSizeColumns(sheet);
