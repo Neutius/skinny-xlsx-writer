@@ -10,6 +10,6 @@ import java.util.function.Supplier;
 
 public interface ContentRowSupplier extends Supplier<List<String>> {
 
-    List<String> get();
+	List<String> get();
 
 }

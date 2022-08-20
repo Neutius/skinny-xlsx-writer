@@ -23,67 +23,67 @@ import java.util.Optional;
  * The HSSFWorkbook implementation class is NOT supported, since that class is used for writing .xls files.
  */
 public class SkinnyFileWriter implements XlsxFileWriter {
-    private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
 
-    private boolean lastWriteSuccessful;
-    private Exception lastWriteException;
+	private boolean lastWriteSuccessful;
+	private Exception lastWriteException;
 
-    @Override
-    public void write(Workbook content, File outputFile) {
-        try {
-            writeContentToFileSystem(content, sanitizeOutputFile(outputFile));
-            lastWriteSuccessful = true;
-            lastWriteException = null;
-        } catch (Exception e) {
-            LOG.warn("An exception occurred while writing to the file system", e);
-            lastWriteSuccessful = false;
-            lastWriteException = e;
-        }
-    }
+	@Override
+	public void write(Workbook content, File outputFile) {
+		try {
+			writeContentToFileSystem(content, sanitizeOutputFile(outputFile));
+			lastWriteSuccessful = true;
+			lastWriteException = null;
+		} catch (Exception e) {
+			LOG.warn("An exception occurred while writing to the file system", e);
+			lastWriteSuccessful = false;
+			lastWriteException = e;
+		}
+	}
 
-    @Override
-    public boolean isLastWriteSuccessful() {
-        return lastWriteSuccessful;
-    }
+	@Override
+	public boolean isLastWriteSuccessful() {
+		return lastWriteSuccessful;
+	}
 
-    @Override
-    public Optional<Exception> getLastWriteException() {
-        return Optional.ofNullable(lastWriteException);
-    }
+	@Override
+	public Optional<Exception> getLastWriteException() {
+		return Optional.ofNullable(lastWriteException);
+	}
 
-    private void writeContentToFileSystem(Workbook content, File outputFile) throws IOException {
-        outputFile.createNewFile();
+	private void writeContentToFileSystem(Workbook content, File outputFile) throws IOException {
+		outputFile.createNewFile();
 
-        try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-            content.write(outputStream);
-        }
+		try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+			content.write(outputStream);
+		}
 
-    }
+	}
 
-    private static File sanitizeOutputFile(File outputFile) {
-        if (!outputFile.getParentFile().exists()) {
-            LOG.info("Directory {} does not exist and will be created before writing to file {}",
-                    outputFile.getParentFile(), outputFile);
-            outputFile.getParentFile().mkdirs();
-        }
-        if (outputFile.exists()) {
-            File actualOutputFile = getActualOutputFile(outputFile);
-            LOG.info("File {} already exists. Workbook content will be written to new file {}", outputFile, actualOutputFile);
-            return actualOutputFile;
-        }
-        return outputFile;
-    }
+	private static File sanitizeOutputFile(File outputFile) {
+		if (!outputFile.getParentFile().exists()) {
+			LOG.info("Directory {} does not exist and will be created before writing to file {}",
+					outputFile.getParentFile(), outputFile);
+			outputFile.getParentFile().mkdirs();
+		}
+		if (outputFile.exists()) {
+			File actualOutputFile = getActualOutputFile(outputFile);
+			LOG.info("File {} already exists. Workbook content will be written to new file {}", outputFile, actualOutputFile);
+			return actualOutputFile;
+		}
+		return outputFile;
+	}
 
-    private static File getActualOutputFile(File outputFile) {
-        return new File(outputFile.getParentFile(), getFileName());
-    }
+	private static File getActualOutputFile(File outputFile) {
+		return new File(outputFile.getParentFile(), getFileName());
+	}
 
-    private static String getFileName() {
-        return "output-at-" + getTimeStamp() + ".xlsx";
-    }
+	private static String getFileName() {
+		return "output-at-" + getTimeStamp() + ".xlsx";
+	}
 
-    private static String getTimeStamp() {
-        return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
-    }
+	private static String getTimeStamp() {
+		return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+	}
 
 }

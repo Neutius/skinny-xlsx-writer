@@ -9,48 +9,46 @@ import java.util.Collection;
 import java.util.List;
 
 public class SkinnySheetContentSupplier implements SheetContentSupplier {
-    private final List<ContentRowSupplier> contentRowSuppliers = new ArrayList<>();
+	private final List<ContentRowSupplier> contentRowSuppliers = new ArrayList<>();
 
-    @Override
-    public List<ContentRowSupplier> get() {
-        return contentRowSuppliers;
-    }
+	@Override
+	public List<ContentRowSupplier> get() {
+		return contentRowSuppliers;
+	}
 
-    public SkinnySheetContentSupplier() {
-    }
+	public SkinnySheetContentSupplier() {
+	}
 
-    public SkinnySheetContentSupplier(Collection<ContentRowSupplier> initialContent) {
-        initialContent.forEach(this::addContentRowSupplierToSheet);
-    }
+	public SkinnySheetContentSupplier(Collection<ContentRowSupplier> initialContent) {
+		initialContent.forEach(this::addContentRowSupplierToSheet);
+	}
 
-    public SkinnySheetContentSupplier(ContentRowSupplier... initialContent) {
-        Arrays.asList(initialContent).forEach(this::addContentRowSupplierToSheet);
-    }
+	public SkinnySheetContentSupplier(ContentRowSupplier... initialContent) {
+		Arrays.asList(initialContent).forEach(this::addContentRowSupplierToSheet);
+	}
 
-    public void addContentRowSupplier(ContentRowSupplier contentRowSupplier) {
-        addContentRowSupplierToSheet(contentRowSupplier);
-    }
+	public void addContentRowSupplier(ContentRowSupplier contentRowSupplier) {
+		addContentRowSupplierToSheet(contentRowSupplier);
+	}
 
-    private void addContentRowSupplierToSheet(ContentRowSupplier contentRowSupplier) {
-        if (contentRowSupplier == null || contentRowSupplier.get() == null) {
-            contentRowSuppliers.add(new SkinnyContentRowSupplier());
-        }
-        else {
-            contentRowSuppliers.add(contentRowSupplier);
-        }
-    }
+	private void addContentRowSupplierToSheet(ContentRowSupplier contentRowSupplier) {
+		if (contentRowSupplier == null || contentRowSupplier.get() == null) {
+			contentRowSuppliers.add(new SkinnyContentRowSupplier());
+		} else {
+			contentRowSuppliers.add(contentRowSupplier);
+		}
+	}
 
-    public void addContentRow(Collection<String> contentRow) {
-        if (contentRow == null) {
-            contentRowSuppliers.add(new SkinnyContentRowSupplier());
-        }
-        else {
-            contentRowSuppliers.add(new SkinnyContentRowSupplier(contentRow));
-        }
-    }
+	public void addContentRow(Collection<String> contentRow) {
+		if (contentRow == null) {
+			contentRowSuppliers.add(new SkinnyContentRowSupplier());
+		} else {
+			contentRowSuppliers.add(new SkinnyContentRowSupplier(contentRow));
+		}
+	}
 
-    public void addContentRow(String... contentRow) {
-        contentRowSuppliers.add(new SkinnyContentRowSupplier(contentRow));
-    }
+	public void addContentRow(String... contentRow) {
+		contentRowSuppliers.add(new SkinnyContentRowSupplier(contentRow));
+	}
 
 }

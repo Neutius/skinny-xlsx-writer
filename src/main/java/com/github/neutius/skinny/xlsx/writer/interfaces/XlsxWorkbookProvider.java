@@ -8,6 +8,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public interface XlsxWorkbookProvider {
 
-    Workbook getWorkbook();
+	Workbook getWorkbook();
 
 }
