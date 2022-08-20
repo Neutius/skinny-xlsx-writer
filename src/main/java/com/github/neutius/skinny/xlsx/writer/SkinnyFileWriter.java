@@ -24,6 +24,7 @@ import java.util.Optional;
  */
 public class SkinnyFileWriter implements XlsxFileWriter {
 	private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
 	private boolean lastWriteSuccessful;
 	private Exception lastWriteException;
@@ -83,7 +84,7 @@ public class SkinnyFileWriter implements XlsxFileWriter {
 	}
 
 	private static String getTimeStamp() {
-		return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+		return DATE_FORMAT.format(new Date());
 	}
 
 }

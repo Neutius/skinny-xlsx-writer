@@ -1,6 +1,7 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -95,6 +96,40 @@ class SkinnyFileWriterTest {
 		assertThat(targetFolder.listFiles()).hasSize(1);
 		assertThat(nonExistentDirectory).exists();
 		assertThat(outputFile).exists();
+	}
+
+	@Test
+	void outputFileParameterIsNull_writeToFile_noFileWritten(@TempDir File targetFolder) {
+		Workbook content = mock(Workbook.class);
+		File outputFile = null;
+
+		assertThat(targetFolder.listFiles()).hasSize(0);
+
+		testSubject.write(content, outputFile);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(targetFolder.listFiles()).hasSize(0);
+		softly.assertThat(testSubject.isLastWriteSuccessful()).isFalse();
+		softly.assertThat(testSubject.getLastWriteException()).isNotEmpty();
+		softly.assertThat(testSubject.getLastWriteException().get()).isInstanceOf(NullPointerException.class);
+		softly.assertAll();
+	}
+
+	@Test
+	void workbookParameterIsNull_writeToFile_emptyFileWritten(@TempDir File targetFolder) {
+		Workbook content = null;
+		File outputFile = new File(targetFolder, "test.xlsx");
+
+		assertThat(targetFolder.listFiles()).hasSize(0);
+
+		testSubject.write(content, outputFile);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(targetFolder.listFiles()).hasSize(1);
+		softly.assertThat(testSubject.isLastWriteSuccessful()).isFalse();
+		softly.assertThat(testSubject.getLastWriteException()).isNotEmpty();
+		softly.assertThat(testSubject.getLastWriteException().get()).isInstanceOf(NullPointerException.class);
+		softly.assertAll();
 	}
 
 }
