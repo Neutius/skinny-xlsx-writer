@@ -1,6 +1,7 @@
 package com.github.neutius.skinny.xlsx.writer;
 
 import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
@@ -9,15 +10,14 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,10 +97,17 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
     }
 
     private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
-        sheetContentSupplier.get().forEach(row -> addRowToSheet(row.get(), sheet));
+        sheetContentSupplier.get().forEach(row -> addRowToSheet(sanitizeRow(row).get(), sheet));
         if (sheet.getPhysicalNumberOfRows() < 100) {
             autoSizeColumns(sheet);
         }
+    }
+
+    private static ContentRowSupplier sanitizeRow(ContentRowSupplier row) {
+        if (row == null || row.get() == null) {
+            return Collections::emptyList;
+        }
+        return row;
     }
 
     private static void addRowToSheet(List<String> cellValues, SXSSFSheet sheet) {
@@ -113,7 +120,14 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 
     private static void addCellToRow(String cellContent, SXSSFRow row) {
         SXSSFCell cell = row.createCell(row.getPhysicalNumberOfCells());
-        cell.setCellValue(cellContent);
+        cell.setCellValue(sanitizeCellContent(cellContent));
+    }
+
+    private static String sanitizeCellContent(String cellContent) {
+        if (cellContent == null || cellContent.isBlank()) {
+            return "";
+        }
+        return cellContent;
     }
 
     private static void autoSizeColumns(SXSSFSheet sheet) {

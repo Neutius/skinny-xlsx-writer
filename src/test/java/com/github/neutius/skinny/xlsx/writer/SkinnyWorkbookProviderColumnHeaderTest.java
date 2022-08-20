@@ -10,8 +10,10 @@ import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +24,13 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 	private static final String VALUE_1 = "value-1";
 	private static final SheetContentSupplier CONTENT_SUPPLIER = () -> List.of(() -> List.of(VALUE_1));
 	private static final String SHEET_NAME = "sheet name";
+
+	private static final String EMPTY_STRING = "";
+
+	private static final String NULL_VALUE = null;
+	private static final String SPACES = "    ";
+	private static final String NEW_LINES = String.format("%n%n%n%n");
+	private static final String TABS = "\t\t\t\t";
 
 	private SkinnyWorkbookProvider testSubject;
 
@@ -83,6 +92,26 @@ class SkinnyWorkbookProviderColumnHeaderTest {
 
 		assertThat(workbook.getSheetAt(0).getPhysicalNumberOfRows()).isEqualTo(1);
 		assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
+	}
+
+	@Test
+	void columnHeadersContainNullAndBlankValues_replacedWithEmptyStrings() {
+		ColumnHeaderSupplier headerSupplier = () ->
+				Arrays.asList(HEADER_1, NULL_VALUE, EMPTY_STRING, SPACES, TABS, NEW_LINES, HEADER_1);
+		SheetProvider sheetProvider = new SkinnySheetProvider(CONTENT_SUPPLIER, SHEET_NAME, headerSupplier);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(HEADER_1);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(1).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(2).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(3).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(4).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(5).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(6).getStringCellValue()).isEqualTo(HEADER_1);
+		softly.assertAll();
 	}
 
 	@Test

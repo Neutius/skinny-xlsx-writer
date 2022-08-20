@@ -6,9 +6,11 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SkinnyWorkbookProviderTest {
 	private static final String VALUE_1 = "value-1";
 	private static final String SHEET_NAME = "sheet name";
+
+	private static final String EMPTY_STRING = "";
+
+	private static final String NULL_VALUE = null;
+	private static final String SPACES = "    ";
+	private static final String NEW_LINES = String.format("%n%n%n%n");
+	private static final String TABS = "\t\t\t\t";
 
 	private SkinnyWorkbookProvider testSubject;
 
@@ -82,6 +91,50 @@ class SkinnyWorkbookProviderTest {
 		assertThat(workbook.getSheetAt(0).getRow(3).getCell(1).getStringCellValue()).isEqualTo("0-3-1");
 		assertThat(workbook.getSheetAt(0).getRow(3).getCell(2).getStringCellValue()).isEqualTo("0-3-2");
 		assertThat(workbook.getSheetAt(0).getRow(3).getCell(3).getStringCellValue()).isEqualTo("0-3-3");
+	}
+
+	@Test
+	void addSheetWithNullAndEmptyContentRows_emptyRowsAreAdded() {
+		SheetContentSupplier contentSupplier = () -> Arrays.asList(
+				() -> List.of(VALUE_1),
+				() -> Collections.emptyList(),
+				() -> null,
+				null,
+				() -> List.of(VALUE_1));
+		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(workbook.getSheetAt(0)).hasSize(5);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0)).hasSize(1);
+		softly.assertThat(workbook.getSheetAt(0).getRow(1)).isNotNull().isEmpty();
+		softly.assertThat(workbook.getSheetAt(0).getRow(2)).isNotNull().isEmpty();
+		softly.assertThat(workbook.getSheetAt(0).getRow(3)).isNotNull().isEmpty();
+		softly.assertThat(workbook.getSheetAt(0).getRow(4)).hasSize(1);
+
+		softly.assertAll();
+	}
+
+	@Test
+	void columnHeadersContainNullAndBlankValues_replacedWithEmptyStrings() {
+		SheetContentSupplier contentSupplier = () -> List.of(() ->
+				Arrays.asList(VALUE_1, NULL_VALUE, EMPTY_STRING, SPACES, TABS, NEW_LINES, VALUE_1));
+		SheetProvider sheetProvider = new SkinnySheetProvider(contentSupplier, SHEET_NAME);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheetProvider));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo(VALUE_1);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(1).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(2).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(3).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(4).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(5).getStringCellValue()).isEqualTo(EMPTY_STRING);
+		softly.assertThat(workbook.getSheetAt(0).getRow(0).getCell(6).getStringCellValue()).isEqualTo(VALUE_1);
+		softly.assertAll();
 	}
 
 	@Test
