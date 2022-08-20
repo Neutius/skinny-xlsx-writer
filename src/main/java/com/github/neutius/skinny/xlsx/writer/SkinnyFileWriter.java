@@ -61,7 +61,7 @@ public class SkinnyFileWriter implements XlsxFileWriter {
 
 	}
 
-	private static File sanitizeOutputFile(File outputFile) {
+	private static File sanitizeOutputFile(File outputFile) throws InterruptedException {
 		if (!outputFile.getParentFile().exists()) {
 			LOG.info("Directory {} does not exist and will be created before writing to file {}",
 					outputFile.getParentFile(), outputFile);
@@ -69,6 +69,11 @@ public class SkinnyFileWriter implements XlsxFileWriter {
 		}
 		if (outputFile.exists()) {
 			File actualOutputFile = getActualOutputFile(outputFile);
+			if (actualOutputFile.exists()) {
+				Thread.sleep(1000);
+				actualOutputFile = getActualOutputFile(outputFile);
+			}
+
 			LOG.info("File {} already exists. Workbook content will be written to new file {}", outputFile, actualOutputFile);
 			return actualOutputFile;
 		}

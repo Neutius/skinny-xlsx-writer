@@ -82,6 +82,22 @@ class SkinnyFileWriterTest {
 	}
 
 	@Test
+	void writeToFileFiveTimes_fiveFilesAreCreated(@TempDir File targetFolder) {
+		Workbook content = mock(Workbook.class);
+		File outputFile = new File(targetFolder, "test.xlsx");
+
+		assertThat(targetFolder.listFiles()).hasSize(0);
+
+		testSubject.write(content, outputFile);
+		testSubject.write(content, outputFile);
+		testSubject.write(content, outputFile);
+		testSubject.write(content, outputFile);
+		testSubject.write(content, outputFile);
+
+		assertThat(targetFolder.listFiles()).hasSize(5);
+	}
+
+	@Test
 	void outputFileInNonExistentDirectory_writeToFile_bothDirectoryAndFileAreCreated(@TempDir File targetFolder) {
 		Workbook content = mock(Workbook.class);
 		File nonExistentDirectory = new File(targetFolder, "non-existent");
