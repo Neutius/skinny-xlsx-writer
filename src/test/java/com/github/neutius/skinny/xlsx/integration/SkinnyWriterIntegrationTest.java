@@ -35,6 +35,12 @@ class SkinnyWriterIntegrationTest {
 	private static final String NULL_VALUE_SHEET_NAME = null;
 	private static final String CORNER_CASE_SHEET_NAME = "This sheet name is too long and will be snipped by Apache POI";
 
+	private static final String VALUE_WITH_TABS = "we \t like \t tabs \t\t\t too \t much";
+	private static final String VALUE_WITH_NEW_LINES = "we \n use \n new \n lines \n\n\n\n within a \n single \n value";
+	private static final String VALUE_WITH_SPECIAL_CHARACTERS = " \\ \\ \" \" ; || ;; | , . \" ";
+	private static final String HEART = "♥";
+	private static final String ARROWS = "↨↑↓→←↔";
+
 	private static XSSFWorkbook actualWorkbook;
 
 	@BeforeAll
@@ -172,13 +178,60 @@ class SkinnyWriterIntegrationTest {
 	}
 
 	private static SheetProvider getCornerCaseSheet() {
-		return new TestSheet(CORNER_CASE_SHEET_NAME, null, null);
+		ColumnHeaderSupplier columnHeaderSupplier = new SkinnyColumnHeaderSupplier(
+				List.of("entry0", "1", "?", "Mariënberg", "Curaçao"));
+
+		List<String> firstRow = List.of(VALUE_WITH_TABS, VALUE_WITH_NEW_LINES, VALUE_WITH_SPECIAL_CHARACTERS, HEART, ARROWS);
+		List<String> secondRow = List.of("entry1", "false", "true", "null");
+		List<String> thirdRow = List.of("entry2", "", "", "", "", "sixth      column");
+
+		SheetContentSupplier sheetContentSupplier = new SkinnySheetContentSupplier(
+				List.of(() -> firstRow, () -> secondRow, () -> thirdRow));
+
+		return new TestSheet(CORNER_CASE_SHEET_NAME, columnHeaderSupplier, sheetContentSupplier);
+	}
+
+	@Test
+	void cornerCaseSheetHasAllContent() {
+		XSSFSheet absentSheet = actualWorkbook.getSheet(CORNER_CASE_SHEET_NAME);
+		XSSFSheet actualSheet = actualWorkbook.getSheet(CORNER_CASE_SHEET_NAME.substring(0, 31));
+
+		SoftAssertions softly = new SoftAssertions();
+
+		softly.assertThat(absentSheet).isNull();
+		softly.assertThat(actualSheet).hasSize(4);
+		assertCellValue(actualSheet, softly, 0, 0, "entry0");
+		assertCellValue(actualSheet, softly, 0, 1, "1");
+		assertCellValue(actualSheet, softly, 0, 2, "?");
+		assertCellValue(actualSheet, softly, 0, 3, "Mariënberg");
+		assertCellValue(actualSheet, softly, 0, 4, "Curaçao");
+		assertCellValue(actualSheet, softly, 1, 0, VALUE_WITH_TABS);
+		assertCellValue(actualSheet, softly, 1, 1, VALUE_WITH_NEW_LINES);
+		assertCellValue(actualSheet, softly, 1, 2, VALUE_WITH_SPECIAL_CHARACTERS);
+		assertCellValue(actualSheet, softly, 1, 3, HEART);
+		assertCellValue(actualSheet, softly, 1, 4, ARROWS);
+
+		assertCellValue(actualSheet, softly, 2, 0, "entry1");
+		assertCellValue(actualSheet, softly, 2, 1, "false");
+		assertCellValue(actualSheet, softly, 2, 2, "true");
+		assertCellValue(actualSheet, softly, 2, 3, "null");
+
+		assertCellValue(actualSheet, softly, 3, 0, "entry2");
+		assertCellValue(actualSheet, softly, 3, 1, "");
+		assertCellValue(actualSheet, softly, 3, 2, "");
+		assertCellValue(actualSheet, softly, 3, 3, "");
+		assertCellValue(actualSheet, softly, 3, 4, "");
+		assertCellValue(actualSheet, softly, 3, 5, "sixth      column");
+
+		softly.assertAll();
+	}
+
+	private void assertCellValue(XSSFSheet actualSheet, SoftAssertions softly, int row, int cell, String expected) {
+		softly.assertThat(actualSheet.getRow(row).getCell(cell).getStringCellValue()).isEqualTo(expected);
 	}
 
 	// TODO for coverage: call SkinnySheetContentSupplier()
-	// TODO for coverage: call SkinnySheetContentSupplier(Collection<ContentRowSupplier> initialContent)
 	// TODO for coverage: call SkinnyColumnHeaderSupplier()
-	// TODO for coverage: call SkinnyColumnHeaderSupplier(Collection<String> initialContent)
 
 	private static File writeToFile(File targetFolder, SXSSFWorkbook workbook) {
 		File outputFile = new File(targetFolder, "integration-test.xlsx");
