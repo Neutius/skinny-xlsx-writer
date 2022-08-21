@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -21,9 +22,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 	private final SXSSFWorkbook workbook = new SXSSFWorkbook();
+	private final SheetNameHandler nameHandler;
 
 	@Override
 	public SXSSFWorkbook getWorkbook() {
@@ -31,9 +34,11 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 	}
 
 	public SkinnyWorkbookProvider() {
+		nameHandler = new SheetNameHandler(workbook);
 	}
 
 	public SkinnyWorkbookProvider(Collection<SheetProvider> sheetProviders) {
+		nameHandler = new SheetNameHandler(workbook);
 		sheetProviders.forEach(this::addSheetToWorkbook);
 	}
 
@@ -48,18 +53,9 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 	}
 
 	private SXSSFSheet createSheet(String sheetName) {
-		boolean isValidName = sheetName != null && !(sheetName.isBlank());
-		return isValidName ? workbook.createSheet(sanitizeSheetName(sheetName)) : workbook.createSheet();
-	}
-
-	private String sanitizeSheetName(String sheetName) {
-		return isUnique(sheetName) ? sheetName : sheetName + "-" + workbook.getNumberOfSheets();
-	}
-
-	private boolean isUnique(String sheetName) {
-		Set<String> sheetNamesInWorkbook = new HashSet<>();
-		workbook.forEach(sheet -> sheetNamesInWorkbook.add(sheet.getSheetName()));
-		return !sheetNamesInWorkbook.contains(sheetName);
+		return sheetName == null || sheetName.isBlank()
+				? workbook.createSheet()
+				: workbook.createSheet(nameHandler.sanitize(sheetName));
 	}
 
 	private static void addColumnHeaders(SheetProvider sheetProvider, SXSSFSheet sheet) {
@@ -70,6 +66,10 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 			sheet.createFreezePane(0, 1);
 			sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, headerSupplier.get().size() - 1));
 		}
+	}
+
+	private static boolean columnHeadersAreProvided(ColumnHeaderSupplier columnHeaderSupplier) {
+		return columnHeaderSupplier != null && columnHeaderSupplier.get() != null && !(columnHeaderSupplier.get().isEmpty());
 	}
 
 	private static void applyColumnHeaderFormattingToFirstRow(SXSSFSheet sheet) {
@@ -90,10 +90,6 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 		Font boldFont = workbook.createFont();
 		boldFont.setBold(true);
 		return boldFont;
-	}
-
-	private static boolean columnHeadersAreProvided(ColumnHeaderSupplier columnHeaderSupplier) {
-		return columnHeaderSupplier != null && columnHeaderSupplier.get() != null && !(columnHeaderSupplier.get().isEmpty());
 	}
 
 	private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
@@ -147,6 +143,42 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 			columnAmount = Math.max(row.getPhysicalNumberOfCells(), columnAmount);
 		}
 		return columnAmount;
+	}
+
+	private static class SheetNameHandler {
+		private static final int MAX_LENGTH = 31;
+		private final Workbook workbook;
+		private Set<String> sheetNamesInWorkbook;
+
+		private SheetNameHandler(Workbook workbook) {
+			this.workbook = workbook;
+		}
+
+		private String sanitize(String sheetName) {
+			sheetNamesInWorkbook = new HashSet<>();
+			workbook.forEach(sheet -> sheetNamesInWorkbook.add(sheet.getSheetName()));
+			return isUnique(sheetName) ? sheetName : createUniqueSheetName(sheetName);
+		}
+
+		private boolean isUnique(String sheetName) {
+			String snippedSheetName = sheetName.length() <= MAX_LENGTH ? sheetName : sheetName.substring(0, MAX_LENGTH);
+			return !sheetNamesInWorkbook.contains(snippedSheetName);
+		}
+
+		private String createUniqueSheetName(String sheetName) {
+			String numberedSheetName = sheetName + "-" + workbook.getNumberOfSheets();
+			if (isUnique(numberedSheetName)) {
+				return numberedSheetName;
+			}
+			return padWithRandomCharacters(sheetName);
+		}
+
+		private String padWithRandomCharacters(String sheetName) {
+			String shortenedSheetName = sheetName.length() <= 22 ? sheetName : sheetName.substring(0, 22);
+			String paddedSheetName = shortenedSheetName + "-" + UUID.randomUUID().toString().substring(0, 8);
+			return isUnique(paddedSheetName) ? paddedSheetName : padWithRandomCharacters(sheetName);
+		}
+
 	}
 
 }

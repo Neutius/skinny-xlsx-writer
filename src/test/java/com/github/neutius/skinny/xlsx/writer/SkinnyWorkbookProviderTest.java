@@ -261,10 +261,10 @@ class SkinnyWorkbookProviderTest {
 
 	@Test
 	void addSheetsWithEmptyAndBlankNames_sheetsHaveNames() {
-		SheetProvider sheet1 = new TestSheet(EMPTY_STRING, null, null);
-		SheetProvider sheet2 = new TestSheet(SPACES, null, null);
-		SheetProvider sheet3 = new TestSheet(TABS, null, null);
-		SheetProvider sheet4 = new TestSheet(NEW_LINES, null, null);
+		SheetProvider sheet1 = new TestSheet(EMPTY_STRING);
+		SheetProvider sheet2 = new TestSheet(SPACES);
+		SheetProvider sheet3 = new TestSheet(TABS);
+		SheetProvider sheet4 = new TestSheet(NEW_LINES);
 		testSubject = new SkinnyWorkbookProvider(List.of(sheet1, sheet2, sheet3, sheet4));
 
 		Workbook workbook = testSubject.getWorkbook();
@@ -275,10 +275,43 @@ class SkinnyWorkbookProviderTest {
 		assertThat(workbook.getSheetAt(3).getSheetName()).isNotNull().isNotBlank();
 	}
 
+	@Test
+	void addSheetWithLongName_nameIsSnipped() {
+		String longName = "abcdefghijklmnopqrstuvwxyz0123456789";
+		SheetProvider sheet = new TestSheet(longName);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheet));
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank().isEqualTo("abcdefghijklmnopqrstuvwxyz01234");
+	}
+
+	@Test
+	void addSheetsWithLongNames_namesAreSnipped() {
+		String longName = "Sheetnames cannot be longer than 31 characters";
+		SheetProvider sheet1 = new TestSheet(longName);
+		SheetProvider sheet2 = new TestSheet(longName);
+		testSubject = new SkinnyWorkbookProvider(List.of(sheet1, sheet2));
+
+		Workbook workbook = testSubject.getWorkbook();
+		String longNameSnipped = longName.substring(0, 31);
+
+		String sheetName1 = workbook.getSheetAt(0).getSheetName();
+		String sheetName2 = workbook.getSheetAt(1).getSheetName();
+		System.out.println("Sheetname 1: " + sheetName1);
+		System.out.println("Sheetname 2: " + sheetName2);
+		assertThat(sheetName1).isNotNull().isNotBlank().isEqualTo(longNameSnipped);
+		assertThat(sheetName2).isNotNull().isNotBlank().isNotEqualTo(longNameSnipped);
+	}
+
 	private static class TestSheet implements SheetProvider {
 		private final String sheetName;
 		private final ColumnHeaderSupplier columnHeaderSupplier;
 		private final SheetContentSupplier sheetContentSupplier;
+
+		public TestSheet(String sheetName) {
+			this(sheetName, null, null);
+		}
 
 		public TestSheet(String sheetName, ColumnHeaderSupplier columnHeaderSupplier,
 						 SheetContentSupplier sheetContentSupplier) {
