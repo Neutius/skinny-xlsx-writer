@@ -294,14 +294,10 @@ class SkinnyWorkbookProviderTest {
 		testSubject = new SkinnyWorkbookProvider(List.of(sheet1, sheet2));
 
 		Workbook workbook = testSubject.getWorkbook();
-		String longNameSnipped = longName.substring(0, 31);
 
-		String sheetName1 = workbook.getSheetAt(0).getSheetName();
-		String sheetName2 = workbook.getSheetAt(1).getSheetName();
-		System.out.println("Sheetname 1: " + sheetName1);
-		System.out.println("Sheetname 2: " + sheetName2);
-		assertThat(sheetName1).isNotNull().isNotBlank().isEqualTo(longNameSnipped);
-		assertThat(sheetName2).isNotNull().isNotBlank().isNotEqualTo(longNameSnipped);
+		String longNameSnipped = longName.substring(0, 31);
+		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank().isEqualTo(longNameSnipped);
+		assertThat(workbook.getSheetAt(1).getSheetName()).isNotNull().isNotBlank().isNotEqualTo(longNameSnipped);
 	}
 
 	private static class TestSheet implements SheetProvider {
