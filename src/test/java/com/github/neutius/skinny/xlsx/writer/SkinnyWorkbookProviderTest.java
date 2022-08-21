@@ -1,6 +1,6 @@
 package com.github.neutius.skinny.xlsx.writer;
 
-import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
+import com.github.neutius.skinny.xlsx.test.TestSheet;
 import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
@@ -338,42 +338,6 @@ class SkinnyWorkbookProviderTest {
 		String longNameSnipped = longName.substring(0, 31);
 		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank().isEqualTo(longNameSnipped);
 		assertThat(workbook.getSheetAt(1).getSheetName()).isNotNull().isNotBlank().isNotEqualTo(longNameSnipped);
-	}
-
-	private static class TestSheet implements SheetProvider {
-		private final String sheetName;
-		private final ColumnHeaderSupplier columnHeaderSupplier;
-		private final SheetContentSupplier sheetContentSupplier;
-
-		public TestSheet(String sheetName) {
-			this(sheetName, null, null);
-		}
-
-		public TestSheet(SheetContentSupplier sheetContentSupplier) {
-			this(null, null, sheetContentSupplier);
-		}
-
-		public TestSheet(String sheetName, ColumnHeaderSupplier columnHeaderSupplier,
-						 SheetContentSupplier sheetContentSupplier) {
-			this.sheetName = sheetName;
-			this.columnHeaderSupplier = columnHeaderSupplier;
-			this.sheetContentSupplier = sheetContentSupplier;
-		}
-
-		@Override
-		public String getSheetName() {
-			return sheetName;
-		}
-
-		@Override
-		public ColumnHeaderSupplier getColumnHeaderSupplier() {
-			return columnHeaderSupplier;
-		}
-
-		@Override
-		public SheetContentSupplier getSheetContentSupplier() {
-			return sheetContentSupplier;
-		}
 	}
 
 }
