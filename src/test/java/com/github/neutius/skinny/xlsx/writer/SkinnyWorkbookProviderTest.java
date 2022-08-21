@@ -208,10 +208,7 @@ class SkinnyWorkbookProviderTest {
 
 	@Test
 	void cellValuesHaveDifferentWidthOnlyAfter100Rows_sheetColumnsHaveSameWidth() {
-		List<ContentRowSupplier> contentRowSupplierList = new ArrayList<>();
-		for (int i = 1; i <= 100; i++) {
-			contentRowSupplierList.add(Collections::emptyList);
-		}
+		List<ContentRowSupplier> contentRowSupplierList = getListWithEmptyRows(100);
 		contentRowSupplierList.add(() -> List.of(
 				"short",
 				"medium sized",
@@ -227,10 +224,7 @@ class SkinnyWorkbookProviderTest {
 
 	@Test
 	void cellValuesHaveDifferentWidthOnlyAfter99Rows_sheetColumnsHaveDifferentWidth() {
-		List<ContentRowSupplier> contentRowSupplierList = new ArrayList<>();
-		for (int i = 1; i <= 99; i++) {
-			contentRowSupplierList.add(Collections::emptyList);
-		}
+		List<ContentRowSupplier> contentRowSupplierList = getListWithEmptyRows(99);
 		contentRowSupplierList.add(() -> List.of(
 				"short",
 				"medium sized",
@@ -242,6 +236,52 @@ class SkinnyWorkbookProviderTest {
 
 		assertThat(actualSheet.getColumnWidth(0)).isLessThan(actualSheet.getColumnWidth(1));
 		assertThat(actualSheet.getColumnWidth(1)).isLessThan(actualSheet.getColumnWidth(2));
+	}
+
+	@Test
+	void addSeveralSheets_columnsAreAutoSizedCorrectly() {
+		List<String> differentLength = List.of(
+				"short",
+				"medium sized",
+				"relatively large piece of text");
+		List<ContentRowSupplier> sheetContent1 = List.of(() -> differentLength);
+		List<ContentRowSupplier> sheetContent2 = getListWithEmptyRows(100);
+		sheetContent2.add(() -> differentLength);
+		List<ContentRowSupplier> sheetContent3 = getListWithEmptyRows(99);
+		sheetContent3.add(() -> differentLength);
+		List<ContentRowSupplier> sheetContent4 = getListWithEmptyRows(1);
+		List<ContentRowSupplier> sheetContent5 = List.of(() -> List.of("Same", "Same", "Same"));
+
+		testSubject = new SkinnyWorkbookProvider(List.of(new TestSheet(() -> sheetContent1), new TestSheet(() -> sheetContent2),
+				new TestSheet(() -> sheetContent3), new TestSheet(() -> sheetContent4), new TestSheet(() -> sheetContent5)));
+
+		Workbook workbook = testSubject.getWorkbook();
+		Sheet actualSheet1 = workbook.getSheetAt(0);
+		Sheet actualSheet2 = workbook.getSheetAt(1);
+		Sheet actualSheet3 = workbook.getSheetAt(2);
+		Sheet actualSheet4 = workbook.getSheetAt(3);
+		Sheet actualSheet5 = workbook.getSheetAt(4);
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(actualSheet1.getColumnWidth(0)).isLessThan(actualSheet1.getColumnWidth(1));
+		softly.assertThat(actualSheet1.getColumnWidth(1)).isLessThan(actualSheet1.getColumnWidth(2));
+		softly.assertThat(actualSheet2.getColumnWidth(0)).isEqualTo(actualSheet2.getColumnWidth(1));
+		softly.assertThat(actualSheet2.getColumnWidth(1)).isEqualTo(actualSheet2.getColumnWidth(2));
+		softly.assertThat(actualSheet3.getColumnWidth(0)).isLessThan(actualSheet3.getColumnWidth(1));
+		softly.assertThat(actualSheet3.getColumnWidth(1)).isLessThan(actualSheet3.getColumnWidth(2));
+		softly.assertThat(actualSheet4.getColumnWidth(0)).isEqualTo(actualSheet4.getColumnWidth(1));
+		softly.assertThat(actualSheet4.getColumnWidth(1)).isEqualTo(actualSheet4.getColumnWidth(2));
+		softly.assertThat(actualSheet5.getColumnWidth(0)).isEqualTo(actualSheet5.getColumnWidth(1));
+		softly.assertThat(actualSheet5.getColumnWidth(1)).isEqualTo(actualSheet5.getColumnWidth(2));
+		softly.assertAll();
+	}
+
+	private static List<ContentRowSupplier> getListWithEmptyRows(int amountOfEmptyRows) {
+		List<ContentRowSupplier> result = new ArrayList<>();
+		for (int i = 1; i <= amountOfEmptyRows; i++) {
+			result.add(Collections::emptyList);
+		}
+		return result;
 	}
 
 	@Test
@@ -307,6 +347,10 @@ class SkinnyWorkbookProviderTest {
 
 		public TestSheet(String sheetName) {
 			this(sheetName, null, null);
+		}
+
+		public TestSheet(SheetContentSupplier sheetContentSupplier) {
+			this(null, null, sheetContentSupplier);
 		}
 
 		public TestSheet(String sheetName, ColumnHeaderSupplier columnHeaderSupplier,
