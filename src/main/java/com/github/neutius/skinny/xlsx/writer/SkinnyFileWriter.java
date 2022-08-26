@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -24,7 +24,8 @@ import java.util.Optional;
  */
 public class SkinnyFileWriter implements XlsxFileWriter {
 	private static final Logger LOG = LoggerFactory.getLogger(SkinnyFileWriter.class);
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+	private static final String PATTERN = "yyyy-MM-dd-HH-mm-ss-SSS";
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(PATTERN);
 
 	private boolean lastWriteSuccessful;
 	private Exception lastWriteException;
@@ -70,7 +71,7 @@ public class SkinnyFileWriter implements XlsxFileWriter {
 		if (outputFile.exists()) {
 			File actualOutputFile = getActualOutputFile(outputFile);
 			if (actualOutputFile.exists()) {
-				Thread.sleep(1000);
+				Thread.sleep(1);
 				actualOutputFile = getActualOutputFile(outputFile);
 			}
 
@@ -89,7 +90,7 @@ public class SkinnyFileWriter implements XlsxFileWriter {
 	}
 
 	private static String getTimeStamp() {
-		return DATE_FORMAT.format(new Date());
+		return LocalDateTime.now().format(FORMATTER);
 	}
 
 }
