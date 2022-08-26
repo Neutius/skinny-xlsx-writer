@@ -13,6 +13,8 @@ import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.util.PaneInformation;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.assertj.core.api.SoftAssertions;
@@ -100,6 +102,8 @@ class SkinnyWriterIntegrationTest {
 		softly.assertThat(actualLambdaSheet.getRow(2).getPhysicalNumberOfCells()).isEqualTo(5);
 		softly.assertThat(actualLambdaSheet.getRow(3).getPhysicalNumberOfCells()).isEqualTo(6);
 		softly.assertThat(actualLambdaSheet.getRow(4).getPhysicalNumberOfCells()).isEqualTo(4);
+
+		assertColumnHeaderRowAndContentRow(actualLambdaSheet, softly);
 	}
 
 	private static SheetProvider getDefaultImplementationSheet() {
@@ -153,6 +157,8 @@ class SkinnyWriterIntegrationTest {
 		softly.assertThat(actualSheet.getRow(10).getPhysicalNumberOfCells()).isEqualTo(2);
 		softly.assertThat(actualSheet.getRow(11).getPhysicalNumberOfCells()).isEqualTo(2);
 		softly.assertThat(actualSheet.getRow(12).getPhysicalNumberOfCells()).isEqualTo(2);
+
+		assertColumnHeaderRowAndContentRow(actualSheet, softly);
 	}
 
 	private static SheetProvider getCustomImplementationSheet() {
@@ -176,6 +182,8 @@ class SkinnyWriterIntegrationTest {
 		softly.assertThat(actualSheet.getRow(1).getCell(1).getStringCellValue()).isEqualTo("");
 		softly.assertThat(actualSheet.getRow(1).getCell(2).getStringCellValue()).isEqualTo("");
 		softly.assertThat(actualSheet.getRow(1).getCell(3).getStringCellValue()).isEqualTo("Last content cell");
+
+		assertColumnHeaderRowAndContentRow(actualSheet, softly);
 	}
 
 	private static SheetProvider getNullValueSheet() {
@@ -248,10 +256,30 @@ class SkinnyWriterIntegrationTest {
 		assertCellValue(actualSheet, softly, 3, 3, "");
 		assertCellValue(actualSheet, softly, 3, 4, "");
 		assertCellValue(actualSheet, softly, 3, 5, "sixth      column");
+
+		assertColumnHeaderRowAndContentRow(actualSheet, softly);
 	}
 
 	private static void assertCellValue(XSSFSheet actualSheet, SoftAssertions softly, int row, int cell, String expected) {
 		softly.assertThat(actualSheet.getRow(row).getCell(cell).getStringCellValue()).isEqualTo(expected);
+	}
+
+	private static void assertColumnHeaderRowAndContentRow(XSSFSheet actualSheet, SoftAssertions softly) {
+		XSSFCellStyle contentCellStyle = actualSheet.getRow(1).getCell(0).getCellStyle();
+		softly.assertThat(contentCellStyle.getWrapText()).isFalse();
+		softly.assertThat(contentCellStyle.getFont()).isNotNull();
+		softly.assertThat(contentCellStyle.getFont().getBold()).isFalse();
+
+		XSSFCellStyle headerCellStyle = actualSheet.getRow(0).getCell(0).getCellStyle();
+		softly.assertThat(headerCellStyle.getWrapText()).isFalse();
+		softly.assertThat(headerCellStyle.getFont()).isNotNull();
+		softly.assertThat(headerCellStyle.getFont().getBold()).isTrue();
+
+		PaneInformation paneInformation = actualSheet.getPaneInformation();
+		softly.assertThat(paneInformation).isNotNull();
+		softly.assertThat(paneInformation.isFreezePane()).isTrue();
+		softly.assertThat((int) paneInformation.getHorizontalSplitTopRow()).isEqualTo(1);
+		softly.assertThat((int) paneInformation.getHorizontalSplitPosition()).isEqualTo(1);
 	}
 
 	// TODO for coverage: call SkinnySheetContentSupplier()
