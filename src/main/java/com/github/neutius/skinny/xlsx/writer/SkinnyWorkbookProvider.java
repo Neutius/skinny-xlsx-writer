@@ -1,6 +1,8 @@
 package com.github.neutius.skinny.xlsx.writer;
 
+import com.github.neutius.skinny.xlsx.writer.interfaces.ColumnHeaderSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.ContentRowSupplier;
+import com.github.neutius.skinny.xlsx.writer.interfaces.SheetContentSupplier;
 import com.github.neutius.skinny.xlsx.writer.interfaces.SheetProvider;
 import com.github.neutius.skinny.xlsx.writer.interfaces.XlsxWorkbookProvider;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,31 +47,33 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 	}
 
 	private void addSheetToWorkbook(SheetProvider sheetProvider) {
-		SXSSFSheet sheet = createSheet(sheetProvider);
+		if (sheetProvider == null) {
+			addSheetToWorkbook(SkinnySheetProvider.empty());
+			return;
+		}
+		SXSSFSheet sheet = createSheet(sheetProvider.getSheetName());
 		addColumnHeaders(sheetProvider, sheet);
-		fillSheet(sheetProvider, sheet);
+		fillSheet(sheetProvider.getSheetContentSupplier(), sheet);
 	}
 
-	private SXSSFSheet createSheet(SheetProvider sheetProvider) {
-		return sheetProvider == null || sheetProvider.getSheetName() == null || sheetProvider.getSheetName().isBlank()
+	private SXSSFSheet createSheet(String sheetName) {
+		return sheetName == null || sheetName.isBlank()
 				? workbook.createSheet()
-				: workbook.createSheet(nameHandler.sanitize(sheetProvider.getSheetName()));
+				: workbook.createSheet(nameHandler.sanitize(sheetName));
 	}
 
 	private static void addColumnHeaders(SheetProvider sheetProvider, SXSSFSheet sheet) {
-		if (columnHeadersAreProvided(sheetProvider)) {
-			addRowToSheet(sheetProvider.getColumnHeaderSupplier().get(), sheet);
+		ColumnHeaderSupplier headerSupplier = sheetProvider.getColumnHeaderSupplier();
+		if (columnHeadersAreProvided(headerSupplier)) {
+			addRowToSheet(headerSupplier.get(), sheet);
 			applyColumnHeaderFormattingToFirstRow(sheet);
 			sheet.createFreezePane(0, 1);
-			sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, sheetProvider.getColumnHeaderSupplier().get().size() - 1));
+			sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, headerSupplier.get().size() - 1));
 		}
 	}
 
-	private static boolean columnHeadersAreProvided(SheetProvider sheetProvider) {
-		return sheetProvider != null
-				&& sheetProvider.getColumnHeaderSupplier() != null
-				&& sheetProvider.getColumnHeaderSupplier().get() != null
-				&& !(sheetProvider.getColumnHeaderSupplier().get().isEmpty());
+	private static boolean columnHeadersAreProvided(ColumnHeaderSupplier columnHeaderSupplier) {
+		return columnHeaderSupplier != null && columnHeaderSupplier.get() != null && !(columnHeaderSupplier.get().isEmpty());
 	}
 
 	private static void applyColumnHeaderFormattingToFirstRow(SXSSFSheet sheet) {
@@ -92,12 +96,11 @@ public class SkinnyWorkbookProvider implements XlsxWorkbookProvider {
 		return boldFont;
 	}
 
-	private static void fillSheet(SheetProvider sheetProvider, SXSSFSheet sheet) {
-		if (sheetProvider == null || sheetProvider.getSheetContentSupplier() == null
-				|| sheetProvider.getSheetContentSupplier().get() == null) {
+	private static void fillSheet(SheetContentSupplier sheetContentSupplier, SXSSFSheet sheet) {
+		if (sheetContentSupplier == null || sheetContentSupplier.get() == null) {
 			return;
 		}
-		sheetProvider.getSheetContentSupplier().get().forEach(row -> addRowToSheet(sanitizeRow(row).get(), sheet));
+		sheetContentSupplier.get().forEach(row -> addRowToSheet(sanitizeRow(row).get(), sheet));
 		if (sheet.getPhysicalNumberOfRows() < 100) {
 			autoSizeColumns(sheet);
 		}

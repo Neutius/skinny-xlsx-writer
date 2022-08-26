@@ -10,12 +10,15 @@ public class SkinnySheetProvider implements SheetProvider {
 	public static final String EMPTY_SHEET_NAME = "";
 	public static final ColumnHeaderSupplier EMPTY_COLUMN_HEADER = Collections::emptyList;
 	public static final SheetContentSupplier EMPTY_SHEET_CONTENT = Collections::emptyList;
+	public static final SheetProvider EMPTY_SHEET = new SkinnySheetProvider(EMPTY_SHEET_CONTENT, EMPTY_SHEET_NAME, EMPTY_COLUMN_HEADER);
 
-	// Should these fields be final?
-	// Perhaps adding a zero-argument constructor and setters would add flexibility? - GvdNL 23-07-2022
 	private final String sheetName;
 	private final ColumnHeaderSupplier columnHeaderSupplier;
 	private final SheetContentSupplier sheetContentSupplier;
+
+	public static SheetProvider empty() {
+		return EMPTY_SHEET;
+	}
 
 	@Override
 	public String getSheetName() {
