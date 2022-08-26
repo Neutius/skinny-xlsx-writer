@@ -140,10 +140,10 @@ class SkinnyWriterIntegrationTest {
 
 		softly.assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(13);
 		softly.assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(4);
-		softly.assertThat(actualSheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("First column");
-		softly.assertThat(actualSheet.getRow(0).getCell(1).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(0).getCell(2).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(0).getCell(3).getStringCellValue()).isEqualTo("Last column");
+		assertCellValue(actualSheet, softly, 0, 0, "First column");
+		assertCellValue(actualSheet, softly, 0, 1, "");
+		assertCellValue(actualSheet, softly, 0, 2, "");
+		assertCellValue(actualSheet, softly, 0, 3, "Last column");
 
 		softly.assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(2);
 		softly.assertThat(actualSheet.getRow(2).getPhysicalNumberOfCells()).isEqualTo(2);
@@ -173,15 +173,15 @@ class SkinnyWriterIntegrationTest {
 
 		softly.assertThat(actualSheet).hasSize(2);
 		softly.assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(4);
-		softly.assertThat(actualSheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("First column");
-		softly.assertThat(actualSheet.getRow(0).getCell(1).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(0).getCell(2).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(0).getCell(3).getStringCellValue()).isEqualTo("Last column");
+		assertCellValue(actualSheet, softly, 0, 0, "First column");
+		assertCellValue(actualSheet, softly, 0, 1, "");
+		assertCellValue(actualSheet, softly, 0, 2, "");
+		assertCellValue(actualSheet, softly, 0, 3, "Last column");
 		softly.assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(4);
-		softly.assertThat(actualSheet.getRow(1).getCell(0).getStringCellValue()).isEqualTo("First content cell");
-		softly.assertThat(actualSheet.getRow(1).getCell(1).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(1).getCell(2).getStringCellValue()).isEqualTo("");
-		softly.assertThat(actualSheet.getRow(1).getCell(3).getStringCellValue()).isEqualTo("Last content cell");
+		assertCellValue(actualSheet, softly, 1, 0, "First content cell");
+		assertCellValue(actualSheet, softly, 1, 1, "");
+		assertCellValue(actualSheet, softly, 1, 2, "");
+		assertCellValue(actualSheet, softly, 1, 3, "Last content cell");
 
 		assertColumnHeaderRowAndContentRow(actualSheet, softly);
 	}
