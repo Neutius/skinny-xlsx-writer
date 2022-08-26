@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,8 +48,12 @@ class SkinnyWriterIntegrationTest {
 	private static final SheetProvider nullValueSheet = getNullValueSheet();
 	private static final SheetProvider cornerCaseSheet = getCornerCaseSheet();
 
-	private static final List<SheetProvider> sheetProviderList = List.of(
-			lambdaSheet, defaultImplementationSheet, customImplementationSheet, nullValueSheet, cornerCaseSheet);
+	private static final List<SheetProvider> sheetProviderList = new ArrayList<>(List.of(
+			lambdaSheet, defaultImplementationSheet, customImplementationSheet, nullValueSheet, cornerCaseSheet));
+
+	static {
+		sheetProviderList.add(null);
+	}
 
 	@Test
 	void writeAndReadWorkbookToFileSystem(@TempDir File targetFolder) throws IOException, InvalidFormatException {
@@ -179,7 +185,7 @@ class SkinnyWriterIntegrationTest {
 	private static void nullValueSheetsHaveANameAndNoContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
 		List<XSSFSheet> nullValueSheets = findNullValueSheets(actualWorkbook);
 
-		softly.assertThat(nullValueSheets).hasSize(1);
+		softly.assertThat(nullValueSheets).hasSize(2);
 
 		for (XSSFSheet nullValueSheet : nullValueSheets) {
 			softly.assertThat(nullValueSheet).isNotNull().isEmpty();
@@ -187,25 +193,17 @@ class SkinnyWriterIntegrationTest {
 			softly.assertThatThrownBy(() -> nullValueSheet.getRow(0).getCell(0))
 					.isInstanceOf(NullPointerException.class);
 		}
-
 	}
 
 	private static List<XSSFSheet> findNullValueSheets(XSSFWorkbook actualWorkbook) {
-		List<XSSFSheet> nullValueSheets = new ArrayList<>();
-
-		for (int index = 0; index < actualWorkbook.getNumberOfSheets(); index++) {
-			XSSFSheet currentSheet = actualWorkbook.getSheetAt(index);
-			if (LAMBDA_SHEET_NAME.equals(currentSheet.getSheetName())
-					|| DEFAULT_IMPLEMENTATION_SHEET_NAME.equals(currentSheet.getSheetName())
-					|| CUSTOM_IMPLEMENTATION_SHEET_NAME.equals(currentSheet.getSheetName())
-					|| CORNER_CASE_SHEET_NAME.startsWith(currentSheet.getSheetName())) {
-				// do nothing lol
-			} else {
-				nullValueSheets.add(currentSheet);
-			}
-		}
-
-		return nullValueSheets;
+		return StreamSupport.stream(actualWorkbook.spliterator(), false)
+				.filter(sheet -> !(LAMBDA_SHEET_NAME.equals(sheet.getSheetName())))
+				.filter(sheet -> !(DEFAULT_IMPLEMENTATION_SHEET_NAME.equals(sheet.getSheetName())))
+				.filter(sheet -> !(CUSTOM_IMPLEMENTATION_SHEET_NAME.equals(sheet.getSheetName())))
+				.filter(sheet -> !(CORNER_CASE_SHEET_NAME.startsWith(sheet.getSheetName())))
+				.filter(sheet -> sheet instanceof XSSFSheet)
+				.map(sheet -> (XSSFSheet) sheet)
+				.collect(Collectors.toList());
 	}
 
 	private static SheetProvider getCornerCaseSheet() {
