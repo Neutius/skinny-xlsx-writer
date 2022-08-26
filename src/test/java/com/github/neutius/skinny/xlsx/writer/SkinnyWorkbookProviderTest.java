@@ -300,6 +300,22 @@ class SkinnyWorkbookProviderTest {
 	}
 
 	@Test
+	void sheetsAreNull_sheetsHaveNamesAndNoContent() {
+		List<SheetProvider> listContainingNull = new ArrayList<>();
+		listContainingNull.add(null);
+		testSubject = new SkinnyWorkbookProvider(listContainingNull);
+		testSubject.addSheet(null);
+
+		Workbook workbook = testSubject.getWorkbook();
+
+		assertThat(workbook).hasSize(2);
+		assertThat(workbook.getSheetAt(0).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(0)).hasSize(0);
+		assertThat(workbook.getSheetAt(1).getSheetName()).isNotNull().isNotBlank();
+		assertThat(workbook.getSheetAt(1)).hasSize(0);
+	}
+
+	@Test
 	void addSheetsWithEmptyAndBlankNames_sheetsHaveNames() {
 		SheetProvider sheet1 = new TestSheet(EMPTY_STRING);
 		SheetProvider sheet2 = new TestSheet(SPACES);
