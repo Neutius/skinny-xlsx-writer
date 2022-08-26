@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -57,6 +58,15 @@ class SkinnyWriterIntegrationTest {
 		sheetProviderList.add(null);
 	}
 
+	private XSSFWorkbook actualWorkbook;
+
+	@AfterEach
+	void closeActualWorkbook() throws IOException {
+		if (actualWorkbook != null) {
+			actualWorkbook.close();
+		}
+	}
+
 	@Test
 	void writeAndReadWorkbookToFileSystem(@TempDir File targetFolder) throws IOException, InvalidFormatException {
 		SkinnyWorkbookProvider workbookProvider = new SkinnyWorkbookProvider(sheetProviderList);
@@ -64,7 +74,7 @@ class SkinnyWriterIntegrationTest {
 		SkinnyFileWriter fileWriter = new SkinnyFileWriter();
 		fileWriter.write(workbookProvider.getWorkbook(), outputFile);
 
-		XSSFWorkbook actualWorkbook = new XSSFWorkbook(outputFile);
+		actualWorkbook = new XSSFWorkbook(outputFile);
 
 		assertWorkbookContent(actualWorkbook);
 	}
@@ -73,11 +83,11 @@ class SkinnyWriterIntegrationTest {
 		assertThat(actualWorkbook).isNotNull().isNotEmpty();
 
 		SoftAssertions softly = new SoftAssertions();
-		lambdaSheetHasAllContent(actualWorkbook, softly);
-		defaultImplementationSheetHasAllContent(actualWorkbook, softly);
-		customImplementationSheetHasAllContent(actualWorkbook, softly);
+		lambdaSheetHasAllContent(actualWorkbook, softly, 0);
+		defaultImplementationSheetHasAllContent(actualWorkbook, softly, 1);
+		customImplementationSheetHasAllContent(actualWorkbook, softly, 2);
 		nullValueSheetsHaveANameAndNoContent(actualWorkbook, softly);
-		cornerCaseSheetHasAllContent(actualWorkbook, softly);
+		cornerCaseSheetHasAllContent(actualWorkbook, softly, 4);
 		softly.assertAll();
 	}
 
@@ -93,17 +103,18 @@ class SkinnyWriterIntegrationTest {
 		return new SkinnySheetProvider(sheetContentSupplier, LAMBDA_SHEET_NAME, columnHeaderSupplier);
 	}
 
-	private static void lambdaSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
-		XSSFSheet actualLambdaSheet = actualWorkbook.getSheet(LAMBDA_SHEET_NAME);
+	private static void lambdaSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly, int expectedIndex) {
+		XSSFSheet actualSheet = actualWorkbook.getSheet(LAMBDA_SHEET_NAME);
+		softly.assertThat(actualWorkbook.getSheetAt(expectedIndex)).isEqualTo(actualSheet);
 
-		softly.assertThat(actualLambdaSheet).isNotNull().isNotEmpty().hasSize(5);
-		softly.assertThat(actualLambdaSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(5);
-		softly.assertThat(actualLambdaSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(5);
-		softly.assertThat(actualLambdaSheet.getRow(2).getPhysicalNumberOfCells()).isEqualTo(5);
-		softly.assertThat(actualLambdaSheet.getRow(3).getPhysicalNumberOfCells()).isEqualTo(6);
-		softly.assertThat(actualLambdaSheet.getRow(4).getPhysicalNumberOfCells()).isEqualTo(4);
+		softly.assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(5);
+		softly.assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(5);
+		softly.assertThat(actualSheet.getRow(1).getPhysicalNumberOfCells()).isEqualTo(5);
+		softly.assertThat(actualSheet.getRow(2).getPhysicalNumberOfCells()).isEqualTo(5);
+		softly.assertThat(actualSheet.getRow(3).getPhysicalNumberOfCells()).isEqualTo(6);
+		softly.assertThat(actualSheet.getRow(4).getPhysicalNumberOfCells()).isEqualTo(4);
 
-		assertColumnHeaderRowAndContentRow(actualLambdaSheet, softly);
+		assertColumnHeaderRowAndContentRow(actualSheet, softly);
 	}
 
 	private static SheetProvider getDefaultImplementationSheet() {
@@ -135,8 +146,9 @@ class SkinnyWriterIntegrationTest {
 		return new SkinnySheetProvider(sheetContentSupplier, DEFAULT_IMPLEMENTATION_SHEET_NAME, headerSupplier);
 	}
 
-	private static void defaultImplementationSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
+	private static void defaultImplementationSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly, int expectedIndex) {
 		XSSFSheet actualSheet = actualWorkbook.getSheet(DEFAULT_IMPLEMENTATION_SHEET_NAME);
+		softly.assertThat(actualWorkbook.getSheetAt(expectedIndex)).isEqualTo(actualSheet);
 
 		softly.assertThat(actualSheet).isNotNull().isNotEmpty().hasSize(13);
 		softly.assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(4);
@@ -168,8 +180,9 @@ class SkinnyWriterIntegrationTest {
 		return new TestSheet(CUSTOM_IMPLEMENTATION_SHEET_NAME, columnHeaderSupplier, sheetContentSupplier);
 	}
 
-	private static void customImplementationSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
+	private static void customImplementationSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly, int expectedIndex) {
 		XSSFSheet actualSheet = actualWorkbook.getSheet(CUSTOM_IMPLEMENTATION_SHEET_NAME);
+		softly.assertThat(actualWorkbook.getSheetAt(expectedIndex)).isEqualTo(actualSheet);
 
 		softly.assertThat(actualSheet).hasSize(2);
 		softly.assertThat(actualSheet.getRow(0).getPhysicalNumberOfCells()).isEqualTo(4);
@@ -228,9 +241,10 @@ class SkinnyWriterIntegrationTest {
 		return new TestSheet(CORNER_CASE_SHEET_NAME, columnHeaderSupplier, sheetContentSupplier);
 	}
 
-	private static void cornerCaseSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
+	private static void cornerCaseSheetHasAllContent(XSSFWorkbook actualWorkbook, SoftAssertions softly, int expectedIndex) {
 		XSSFSheet absentSheet = actualWorkbook.getSheet(CORNER_CASE_SHEET_NAME);
 		XSSFSheet actualSheet = actualWorkbook.getSheet(CORNER_CASE_SHEET_NAME.substring(0, 31));
+		softly.assertThat(actualWorkbook.getSheetAt(expectedIndex)).isEqualTo(actualSheet);
 
 		softly.assertThat(absentSheet).isNull();
 		softly.assertThat(actualSheet).hasSize(4);
