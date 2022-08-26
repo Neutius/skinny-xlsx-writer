@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -67,6 +68,7 @@ class SkinnyWriterIntegrationTest {
 		lambdaSheetHasAllContent(actualWorkbook, softly);
 		defaultImplementationSheetHasAllContent(actualWorkbook, softly);
 		customImplementationSheetHasAllContent(actualWorkbook, softly);
+		nullValueSheetsHaveANameAndNoContent(actualWorkbook, softly);
 		cornerCaseSheetHasAllContent(actualWorkbook, softly);
 		softly.assertAll();
 	}
@@ -174,7 +176,37 @@ class SkinnyWriterIntegrationTest {
 		return new TestSheet(NULL_VALUE_SHEET_NAME, null, null);
 	}
 
-	// TODO write assertions for null value sheet
+	private static void nullValueSheetsHaveANameAndNoContent(XSSFWorkbook actualWorkbook, SoftAssertions softly) {
+		List<XSSFSheet> nullValueSheets = findNullValueSheets(actualWorkbook);
+
+		softly.assertThat(nullValueSheets).hasSize(1);
+
+		for (XSSFSheet nullValueSheet : nullValueSheets) {
+			softly.assertThat(nullValueSheet).isNotNull().isEmpty();
+			softly.assertThat(nullValueSheet.getSheetName()).isNotNull().isNotBlank();
+			softly.assertThatThrownBy(() -> nullValueSheet.getRow(0).getCell(0))
+					.isInstanceOf(NullPointerException.class);
+		}
+
+	}
+
+	private static List<XSSFSheet> findNullValueSheets(XSSFWorkbook actualWorkbook) {
+		List<XSSFSheet> nullValueSheets = new ArrayList<>();
+
+		for (int index = 0; index < actualWorkbook.getNumberOfSheets(); index++) {
+			XSSFSheet currentSheet = actualWorkbook.getSheetAt(index);
+			if (LAMBDA_SHEET_NAME.equals(currentSheet.getSheetName())
+					|| DEFAULT_IMPLEMENTATION_SHEET_NAME.equals(currentSheet.getSheetName())
+					|| CUSTOM_IMPLEMENTATION_SHEET_NAME.equals(currentSheet.getSheetName())
+					|| CORNER_CASE_SHEET_NAME.startsWith(currentSheet.getSheetName())) {
+				// do nothing lol
+			} else {
+				nullValueSheets.add(currentSheet);
+			}
+		}
+
+		return nullValueSheets;
+	}
 
 	private static SheetProvider getCornerCaseSheet() {
 		ColumnHeaderSupplier columnHeaderSupplier = new SkinnyColumnHeaderSupplier(
